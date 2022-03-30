@@ -1,4 +1,4 @@
-# sharkiqpy
+# sharkiq
 Unofficial SDK for Shark IQ robot vacuums, designed primarily to support an integration for [Home Assistant](https://www.home-assistant.io/).
 
 This library is heavily based off of [sharkiq](https://github.com/ajmarks/sharkiq) by [@ajmarks](https://github.com/ajmarks), with a few minor changes to allow it to work on newer versions of the Shark API.
@@ -6,13 +6,13 @@ This library is heavily based off of [sharkiq](https://github.com/ajmarks/sharki
 ## Installation
 
 ```bash
-pip install sharkiqpy-ng
+pip install sharkiq
 ```
 
 ## Usage
 ### Simple Operation
 ```python
-from sharkiqpy import get_ayla_api, OperatingModes, Properties, PowerModes
+from sharkiq import get_ayla_api, OperatingModes, Properties, PowerModes
 
 USERNAME = 'me@email.com'
 PASSWORD = '$7r0nkP@s$w0rD'
@@ -31,7 +31,7 @@ shark.return_to_base()
 ### Async operation
 ```python
 import asyncio
-from sharkiqpy import get_ayla_api, OperatingModes, SharkIqVacuum
+from sharkiq import get_ayla_api, OperatingModes, SharkIqVacuum
 
 USERNAME = 'me@email.com'
 PASSWORD = '$7r0nkP@s$w0rD'
