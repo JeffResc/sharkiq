@@ -78,10 +78,12 @@ class TestAylaApi:
         assert e.value.args[0] == "Unauthorized"
 
     def test_set_credentials__valid_response(self, dummy_api):
-        assert dummy_api._access_token is None
-        assert dummy_api._refresh_token is None
-        assert dummy_api._auth_expiration is None
-        assert dummy_api._is_authed == False
+        assert dummy_api._access_token is "token123"
+        assert dummy_api._refresh_token is "token321"
+        assert dummy_api._auth_expiration.timestamp() == pytest.approx(
+            (datetime.now() + timedelta(seconds=700)).timestamp()
+        )
+        assert dummy_api._is_authed == True
 
         t1 = datetime.now() + timedelta(seconds=3600)
         dummy_api._set_credentials(
@@ -104,17 +106,6 @@ class TestAylaApi:
         }
 
     def test_clear_auth(self, dummy_api):
-        # populate auth values
-        assert dummy_api._is_authed == False
-        dummy_api._set_credentials(
-            200,
-            {
-                "access_token": "token123",
-                "refresh_token": "token321",
-                "expires_in": 3600,
-            },
-        )
-
         assert dummy_api._is_authed == True
 
         dummy_api._clear_auth()
@@ -200,8 +191,6 @@ class TestAylaApi:
         assert dummy_api._is_authed == False
 
     def test_check_auth__expiring_soon_exception(self, dummy_api):
-        dummy_api._access_token = "token123"
-        dummy_api._is_authed = True
         dummy_api._auth_expiration = datetime.now() + timedelta(seconds=400)
 
         with pytest.raises(SharkIqAuthExpiringError) as e:
@@ -213,8 +202,10 @@ class TestAylaApi:
         dummy_api.check_auth(raise_expiring_soon=False)
 
     def test_check_auth__valid(self, dummy_api):
-        dummy_api._access_token = "token123"
-        dummy_api._is_authed = True
-        dummy_api._auth_expiration = datetime.now() + timedelta(seconds=700)
-
         assert dummy_api.check_auth() is None
+
+    def test_auth_header(self, dummy_api):
+        dummy_api._access_token = "myfaketoken"
+        assert dummy_api.auth_header == {
+            "Authorization": "auth_token myfaketoken"
+        }
