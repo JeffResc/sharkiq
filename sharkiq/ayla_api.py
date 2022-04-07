@@ -48,7 +48,7 @@ class AylaApi:
         self._app_secret = app_secret
         self.websession = websession
 
-    def ensure_session(self) -> aiohttp.ClientSession:
+    async def ensure_session(self) -> aiohttp.ClientSession:
         """Ensure that we have an aiohttp ClientSession"""
         if self.websession is None:
             self.websession = aiohttp.ClientSession()
@@ -75,7 +75,7 @@ class AylaApi:
         self._access_token = login_result["access_token"]
         self._refresh_token = login_result["refresh_token"]
         self._auth_expiration = datetime.now() + timedelta(seconds=login_result["expires_in"])
-        self._is_authed = True
+        self._is_authed = True  # TODO: Any non 200 status code should cause this to be false
 
     def sign_in(self):
         """Authenticate to Ayla API synchronously."""
@@ -91,14 +91,14 @@ class AylaApi:
 
     async def async_sign_in(self):
         """Authenticate to Ayla API synchronously."""
-        session = self.ensure_session()
+        session = await self.ensure_session()
         login_data = self._login_data
         async with session.post(f"{LOGIN_URL:s}/users/sign_in.json", json=login_data) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     async def async_refresh_auth(self):
         """Refresh the authentication synchronously."""
-        session = self.ensure_session()
+        session = await self.ensure_session()
         refresh_data = {"user": {"refresh_token": self._refresh_token}}
         async with session.post(f"{LOGIN_URL:s}/users/refresh_token.json", json=refresh_data) as resp:
             self._set_credentials(resp.status, await resp.json())
@@ -122,7 +122,7 @@ class AylaApi:
 
     async def async_sign_out(self):
         """Sign out and invalidate the access token"""
-        session = self.ensure_session()
+        session = await self.ensure_session()
         async with session.post(f"{LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data) as _:
             pass
         self._clear_auth()
@@ -183,7 +183,7 @@ class AylaApi:
         return requests.request(method, url, headers=headers, **kwargs)
 
     async def async_request(self, http_method: str, url: str, **kwargs):
-        session = self.ensure_session()
+        session = await self.ensure_session()
         headers = self._get_headers(kwargs)
         return session.request(http_method, url, headers=headers, **kwargs)
 
