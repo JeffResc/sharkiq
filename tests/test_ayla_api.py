@@ -209,3 +209,15 @@ class TestAylaApi:
         assert dummy_api.auth_header == {
             "Authorization": "auth_token myfaketoken"
         }
+
+    def test_get_headers__no_kwargs(self, dummy_api):
+        headers = dummy_api._get_headers({})
+        assert headers == dummy_api.auth_header
+
+    def test_get_headers__kwargs_(self, dummy_api):
+        headers = dummy_api._get_headers({"headers": {"X-Test": "val"}})
+
+        assert headers == {
+            "X-Test": "val",
+            "Authorization": f"auth_token {dummy_api._access_token}"
+        }
