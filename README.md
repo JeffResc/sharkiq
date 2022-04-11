@@ -1,4 +1,7 @@
 [![codecov](https://codecov.io/gh/JeffResc/sharkiq/branch/main/graph/badge.svg?token=DO96BWVXA7)](https://codecov.io/gh/JeffResc/sharkiq)
+![PyPI](https://img.shields.io/pypi/v/sharkiq)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/sharkiq)
+![GitHub](https://img.shields.io/github/license/JeffResc/sharkiq)
 # sharkiq
 Unofficial SDK for Shark IQ robot vacuums, designed primarily to support an integration for [Home Assistant](https://www.home-assistant.io/).
 
