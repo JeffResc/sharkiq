@@ -16,6 +16,10 @@ from .const import (
     LOGIN_URL,
     SHARK_APP_ID,
     SHARK_APP_SECRET,
+    EU_DEVICE_URL,
+    EU_LOGIN_URL,
+    EU_SHARK_APP_ID,
+    EU_SHARK_APP_SECRET
 )
 from .exc import SharkIqAuthError, SharkIqAuthExpiringError, SharkIqNotAuthedError
 from .sharkiq import SharkIqVacuum
@@ -23,9 +27,12 @@ from .sharkiq import SharkIqVacuum
 _session = None
 
 
-def get_ayla_api(username: str, password: str, websession: Optional[aiohttp.ClientSession] = None):
+def get_ayla_api(username: str, password: str, websession: Optional[aiohttp.ClientSession] = None, europe: bool = False):
     """Get an AylaApi object"""
-    return AylaApi(username, password, SHARK_APP_ID, SHARK_APP_SECRET, websession=websession)
+    if europe:
+        return AylaApi(username, password, EU_SHARK_APP_ID, EU_SHARK_APP_SECRET, websession=websession, europe=europe)
+    else:
+        return AylaApi(username, password, SHARK_APP_ID, SHARK_APP_SECRET, websession=websession)
 
 
 class AylaApi:
@@ -37,7 +44,8 @@ class AylaApi:
             password: str,
             app_id: str,
             app_secret: str,
-            websession: Optional[aiohttp.ClientSession] = None):
+            websession: Optional[aiohttp.ClientSession] = None,
+            europe: bool = False):
         self._email = email
         self._password = password
         self._access_token = None  # type: Optional[str]
@@ -46,7 +54,8 @@ class AylaApi:
         self._is_authed = False  # type: bool
         self._app_id = app_id
         self._app_secret = app_secret
-        self.websession = websession
+        self.websession = websession,
+        self.europe = europe
 
     async def ensure_session(self) -> aiohttp.ClientSession:
         """Ensure that we have an aiohttp ClientSession"""
@@ -80,27 +89,27 @@ class AylaApi:
     def sign_in(self):
         """Authenticate to Ayla API synchronously."""
         login_data = self._login_data
-        resp = requests.post(f"{LOGIN_URL:s}/users/sign_in.json", json=login_data)
+        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_in.json", json=login_data)
         self._set_credentials(resp.status_code, resp.json())
 
     def refresh_auth(self):
         """Refresh the authentication synchronously"""
         refresh_data = {"user": {"refresh_token": self._refresh_token}}
-        resp = requests.post(f"{LOGIN_URL:s}/users/refresh_token.json", json=refresh_data)
+        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data)
         self._set_credentials(resp.status_code, resp.json())
 
     async def async_sign_in(self):
         """Authenticate to Ayla API synchronously."""
         session = await self.ensure_session()
         login_data = self._login_data
-        async with session.post(f"{LOGIN_URL:s}/users/sign_in.json", json=login_data) as resp:
+        async with session.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_in.json", json=login_data) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     async def async_refresh_auth(self):
         """Refresh the authentication synchronously."""
         session = await self.ensure_session()
         refresh_data = {"user": {"refresh_token": self._refresh_token}}
-        async with session.post(f"{LOGIN_URL:s}/users/refresh_token.json", json=refresh_data) as resp:
+        async with session.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     @property
@@ -117,13 +126,13 @@ class AylaApi:
 
     def sign_out(self):
         """Sign out and invalidate the access token"""
-        requests.post(f"{LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data)
+        requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data)
         self._clear_auth()
 
     async def async_sign_out(self):
         """Sign out and invalidate the access token"""
         session = await self.ensure_session()
-        async with session.post(f"{LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data) as _:
+        async with session.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data) as _:
             pass
         self._clear_auth()
 
@@ -188,21 +197,21 @@ class AylaApi:
         return session.request(http_method, url, headers=headers, **kwargs)
 
     def list_devices(self) -> List[Dict]:
-        resp = self.request("get", f"{DEVICE_URL:s}/apiv1/devices.json")
+        resp = self.request("get", f"{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/devices.json")
         devices = resp.json()
         if resp.status_code == 401:
             raise SharkIqAuthError(devices["error"]["message"])
         return [d["device"] for d in devices]
 
     async def async_list_devices(self) -> List[Dict]:
-        async with await self.async_request("get", f"{DEVICE_URL:s}/apiv1/devices.json") as resp:
+        async with await self.async_request("get", f"{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/devices.json") as resp:
             devices = await resp.json()
             if resp.status == 401:
                 raise SharkIqAuthError(devices["error"]["message"])
         return [d["device"] for d in devices]
 
     def get_devices(self, update: bool = True) -> List[SharkIqVacuum]:
-        devices = [SharkIqVacuum(self, d) for d in self.list_devices()]
+        devices = [SharkIqVacuum(self, d, europe=self.europe) for d in self.list_devices()]
         if update:
             for device in devices:
                 device.get_metadata()
@@ -210,7 +219,7 @@ class AylaApi:
         return devices
 
     async def async_get_devices(self, update: bool = True) -> List[SharkIqVacuum]:
-        devices = [SharkIqVacuum(self, d) for d in await self.async_list_devices()]
+        devices = [SharkIqVacuum(self, d, europe=self.europe) for d in await self.async_list_devices()]
         if update:
             for device in devices:
                 await device.async_get_metadata()
