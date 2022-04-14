@@ -175,7 +175,7 @@ class AylaApi:
             headers = {}
         else:
             del fn_kwargs['headers']
-        headers.update(self.auth_header)
+        headers |= self.auth_header
         return headers
 
     def request(self, method: str, url: str, **kwargs) -> requests.Response:

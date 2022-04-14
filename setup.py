@@ -39,5 +39,5 @@ setup(
     ],
     packages=packages,
     include_package_data=False,
-    install_requires=list(val.strip() for val in open("requirements.txt")),
+    install_requires=[val.strip() for val in open("requirements.txt")],
 )

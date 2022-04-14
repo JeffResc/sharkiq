@@ -140,8 +140,11 @@ class SharkIqVacuum:
         return f'{DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/data.json'
 
     def _update_metadata(self, metadata: List[Dict]):
-        data = [d['datum'] for d in metadata if d.get('datum', {}).get('key', '') == 'sharkDeviceMobileData']
-        if data:
+        if data := [
+            d['datum']
+            for d in metadata
+            if d.get('datum', {}).get('key', '') == 'sharkDeviceMobileData'
+        ]:
             datum = data[0]
             # I do not know why they don't just use multiple keys for this
             try:
@@ -207,11 +210,7 @@ class SharkIqVacuum:
     def update(self, property_list: Optional[Iterable[str]] = None):
         """Update the known device state"""
         full_update = property_list is None
-        if full_update:
-            params = None
-        else:
-            params = {'names[]': property_list}
-
+        params = None if full_update else {'names[]': property_list}
         resp = self.ayla_api.request('get', self.update_url, params=params)
         properties = resp.json()
         self._do_update(full_update, properties)
@@ -219,11 +218,7 @@ class SharkIqVacuum:
     async def async_update(self, property_list: Optional[Iterable[str]] = None):
         """Update the known device state async"""
         full_update = property_list is None
-        if full_update:
-            params = None
-        else:
-            params = {'names[]': property_list}
-
+        params = None if full_update else {'names[]': property_list}
         async with await self.ayla_api.async_request('get', self.update_url, params=params) as resp:
             properties = await resp.json()
 
@@ -273,8 +268,7 @@ class SharkIqVacuum:
     @property
     def error_text(self) -> Optional[str]:
         """Error message"""
-        err = self.error_code
-        if err:
+        if err := self.error_code:
             return ERROR_MESSAGES.get(err, f'Unknown error ({err})')
         return None
 
@@ -286,8 +280,7 @@ class SharkIqVacuum:
         }
         if not datapoints:
             return {}
-        latest_datum = datapoints[max(datapoints.keys())]
-        return latest_datum
+        return datapoints[max(datapoints.keys())]
 
     def _get_file_property_endpoint(self, property_name: PropertyName) -> str:
         """Check that property_name is a file property and return its lookup endpoint"""
@@ -382,8 +375,7 @@ class SharkPropertiesView(abc.Mapping):
             return value
 
     def __iter__(self):
-        for k in self._shark.properties_full.keys():
-            yield k
+        yield from self._shark.properties_full.keys()
 
     def __len__(self) -> int:
         return self._shark.properties_full.__len__()
