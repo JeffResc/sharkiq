@@ -54,7 +54,7 @@ class AylaApi:
         self._is_authed = False  # type: bool
         self._app_id = app_id
         self._app_secret = app_secret
-        self.websession = websession,
+        self.websession = websession
         self.europe = europe
 
     async def ensure_session(self) -> aiohttp.ClientSession:
