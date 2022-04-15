@@ -1,4 +1,4 @@
-"""Exceptions"""
+"""Exceptions."""
 
 # Default messages
 AUTH_EXPIRED_MESSAGE = 'Ayla Networks API authentication expired.  Re-authenticate and retry.'
@@ -7,17 +7,17 @@ NOT_AUTHED_MESSAGE = 'Ayla Networks API not authenticated.  Authenticate first a
 
 
 class SharkIqError(RuntimeError):
-    """Parent class for all Shark IQ exceptions"""
+    """Parent class for all Shark IQ exceptions."""
 
 
 class SharkIqAuthError(SharkIqError):
-    """Exception authenticating"""
+    """Exception authenticating."""
     def __init__(self, msg=AUTH_FAILURE_MESSAGE, *args):
         super().__init__(msg, *args)
 
 
 class SharkIqAuthExpiringError(SharkIqError):
-    """Authentication expired and needs to be refreshed"""
+    """Authentication expired and needs to be refreshed."""
     def __init__(self, msg=AUTH_EXPIRED_MESSAGE, *args):
         super().__init__(msg, *args)
 

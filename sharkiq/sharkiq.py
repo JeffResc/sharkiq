@@ -1,4 +1,4 @@
-"""Shark IQ Wrapper"""
+"""Shark IQ Wrapper."""
 
 import base64
 import enum
@@ -27,13 +27,28 @@ PropertyValue = Union[str, int, enum.Enum]
 
 
 def _parse_datetime(date_string: str) -> datetime:
-    """Parse a datetime as returned by the Ayla Networks API"""
+    """
+    Parse a datetime as returned by the Ayla Networks API.
+
+    Args:
+        date_string: A datetime string as returned by the Ayla Networks API.
+
+    Returns:
+        A datetime object.
+    """
     return datetime.strptime(date_string, TIMESTAMP_FMT)
 
 
 @enum.unique
 class PowerModes(enum.IntEnum):
-    """Vacuum power modes"""
+    """
+    Vacuum power modes.
+
+    Attributes:
+        ECO: Eco mode.
+        NORMAL: Normal mode.
+        MAX: Max mode.
+    """
     ECO = 1
     NORMAL = 0
     MAX = 2
@@ -41,7 +56,15 @@ class PowerModes(enum.IntEnum):
 
 @enum.unique
 class OperatingModes(enum.IntEnum):
-    """Vacuum operation modes"""
+    """
+    Vacuum operation modes.
+
+    Attributes:
+        STOP: Stopped.
+        PAUSE: Paused.
+        START: Started.
+        RETURN: Returning.
+    """
     STOP = 0
     PAUSE = 1
     START = 2
@@ -50,7 +73,27 @@ class OperatingModes(enum.IntEnum):
 
 @enum.unique
 class Properties(enum.Enum):
-    """Useful properties"""
+    """
+    Useful properties.
+    
+    Attributes:
+        BATTERY_CAPACITY: Battery capacity.
+        CHARGING_STATUS: Charging status.
+        CLEAN_COMPLETE: Cleaning complete.
+        CLEANING_STATISTICS: Cleaning statistics.
+        DOCKED_STATUS: Docked status.
+        ERROR_CODE: Error code.
+        EVACUATING: Evacuating.
+        FIND_DEVICE: Find device.
+        LOW_LIGHT_MISSION: Low light mission.
+        NAV_MODULE_FW_VERSION: Nav module firmware version.
+        OPERATING_MODE: Operating mode.
+        POWER_MODE: Power mode.
+        RECHARGE_RESUME: Recharge resume.
+        RECHARGING_TO_RESUME: Recharging to resume.
+        ROBOT_FIRMWARE_VERSION: Robot firmware version.
+        RSSI: RSSI.
+    """
     BATTERY_CAPACITY = "Battery_Capacity"
     CHARGING_STATUS = "Charging_Status"
     CLEAN_COMPLETE = "CleanComplete"
@@ -89,7 +132,15 @@ ERROR_MESSAGES = {
 
 
 def _clean_property_name(raw_property_name: str) -> str:
-    """Clean up property names"""
+    """
+    Clean up property names.
+    
+    Args:
+        raw_property_name: The raw property name.
+
+    Returns:
+        The cleaned property name.
+    """
     if raw_property_name[:4].upper() in ['SET_', 'GET_']:
         return raw_property_name[4:]
     else:
@@ -97,9 +148,17 @@ def _clean_property_name(raw_property_name: str) -> str:
 
 
 class SharkIqVacuum:
-    """Shark IQ vacuum entity"""
+    """Shark IQ vacuum entity."""
 
     def __init__(self, ayla_api: "AylaApi", device_dct: Dict, europe: bool = False):
+        """
+        Initialize a SharkIqVacuum object.
+
+        Args:
+            ayla_api: The AylaApi object.
+            device_dct: The device dictionary.
+            europe: True if the account is registered in Europe.
+        """
         self.ayla_api = ayla_api
         self._dsn = device_dct['dsn']
         self._key = device_dct['key']
@@ -117,30 +176,71 @@ class SharkIqVacuum:
 
     @property
     def oem_model_number(self) -> str:
+        """
+        The OEM model number.
+        
+        Returns:
+            The OEM model number.
+        """
         return self._oem_model_number
 
     @property
     def vac_model_number(self) -> Optional[str]:
+        """
+        The vacuum model number.
+
+        Returns:
+            The vacuum model number.
+        """
         return self._vac_model_number
 
     @property
     def vac_serial_number(self) -> Optional[str]:
+        """
+        The vacuum serial number.
+
+        Returns:
+            The vacuum serial number.
+        """
         return self._vac_serial_number
 
     @property
     def name(self):
+        """
+        The vacuum name.
+
+        Returns:
+            The vacuum name.
+        """
         return self._name
 
     @property
     def serial_number(self) -> str:
+        """
+        The vacuum serial number.
+
+        Returns:
+            The vacuum serial number.
+        """
         return self._dsn
 
     @property
     def metadata_endpoint(self) -> str:
-        """Endpoint for device metadata"""
+        """
+        Endpoint for device metadata.
+
+        Returns:
+            The endpoint for device metadata.
+        """
         return f'{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/data.json'
 
     def _update_metadata(self, metadata: List[Dict]):
+        """
+        Update metadata.
+
+        Args:
+            metadata: The metadata.
+        """
         data = [d['datum'] for d in metadata if d.get('datum', {}).get('key', '') == 'sharkDeviceMobileData']
         if data:
             datum = data[0]
@@ -153,28 +253,50 @@ class SharkIqVacuum:
             self._vac_serial_number = values.get('vacSerialNumber')
 
     def get_metadata(self):
-        """Fetch device metadata.  Not needed for basic operation."""
+        """Fetch device metadata. Not needed for basic operation."""
         resp = self.ayla_api.request('get', self.metadata_endpoint)
         self._update_metadata(resp.json())
 
     async def async_get_metadata(self):
-        """Fetch device metadata.  Not needed for basic operation."""
+        """Fetch device metadata. Not needed for basic operation."""
         async with await self.ayla_api.async_request('get', self.metadata_endpoint) as resp:
             resp_data = await resp.json()
         self._update_metadata(resp_data)
 
     def set_property_endpoint(self, property_name) -> str:
-        """Get the API endpoint for a given property"""
+        """
+        Get the API endpoint for a given property.
+        
+        Args:
+            property_name: The property name.
+        
+        Returns:
+            The API endpoint.
+        """
         return f'{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/properties/{property_name:s}/datapoints.json'
 
     def get_property_value(self, property_name: PropertyName) -> Any:
-        """Get the value of a property from the properties dictionary"""
+        """
+        Get the value of a property from the properties dictionary.
+        
+        Args:
+            property_name: The property name.
+        
+        Returns:
+            The property value.
+        """
         if isinstance(property_name, enum.Enum):
             property_name = property_name.value
         return self.property_values[property_name]
 
     def set_property_value(self, property_name: PropertyName, value: PropertyValue):
-        """Update a property"""
+        """
+        Update a property.
+
+        Args:
+            property_name: The property name.
+            value: The property value.
+        """
         if isinstance(property_name, enum.Enum):
             property_name = property_name.value
         if isinstance(value, enum.Enum):
@@ -188,7 +310,13 @@ class SharkIqVacuum:
         self.properties_full[property_name].update(resp.json())
 
     async def async_set_property_value(self, property_name: PropertyName, value: PropertyValue):
-        """Update a property async"""
+        """
+        Update a property async.
+
+        Args:
+            property_name: The property name.
+            value: The property value.
+        """
         if isinstance(property_name, enum.Enum):
             property_name = property_name.value
         if isinstance(value, enum.Enum):
@@ -202,11 +330,21 @@ class SharkIqVacuum:
 
     @property
     def update_url(self) -> str:
-        """API endpoint to fetch updated device information"""
+        """
+        API endpoint to fetch updated device information.
+        
+        Returns:
+            The API endpoint.
+        """
         return f'{EU_DEVICE_URL if self.europe else DEVICE_URL}/apiv1/dsns/{self.serial_number}/properties.json'
 
     def update(self, property_list: Optional[Iterable[str]] = None):
-        """Update the known device state"""
+        """
+        Update the known device state.
+
+        Args:
+            property_list: The list of properties to update.
+        """
         full_update = property_list is None
         if full_update:
             params = None
@@ -218,7 +356,12 @@ class SharkIqVacuum:
         self._do_update(full_update, properties)
 
     async def async_update(self, property_list: Optional[Iterable[str]] = None):
-        """Update the known device state async"""
+        """
+        Update the known device state async.
+        
+        Args:
+            property_list: The list of properties to update.
+        """
         full_update = property_list is None
         if full_update:
             params = None
@@ -231,7 +374,13 @@ class SharkIqVacuum:
         self._do_update(full_update, properties)
 
     def _do_update(self, full_update: bool, properties: List[Dict]):
-        """Update the internal state from fetched properties"""
+        """
+        Update the internal state from fetched properties.
+        
+        Args:
+            full_update: Whether to update all properties.
+            properties: The properties.
+        """
         property_names = {p['property']['name'] for p in properties}
         settable_properties = {_clean_property_name(p) for p in property_names if p[:3].upper() == 'SET'}
         readable_properties = {
@@ -251,29 +400,49 @@ class SharkIqVacuum:
         self.properties_full.update(readable_properties)
 
     def set_operating_mode(self, mode: OperatingModes):
-        """Set the operating mode.  This is just a convenience wrapper around `set_property_value`"""
+        """
+        Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+        
+        Args:
+            mode: The operating mode.
+        """
         self.set_property_value(Properties.OPERATING_MODE, mode)
 
     async def async_set_operating_mode(self, mode: OperatingModes):
-        """Set the operating mode.  This is just a convenience wrapper around `set_property_value`"""
+        """
+        Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+        
+        Args:
+            mode: The operating mode.
+        """
         await self.async_set_property_value(Properties.OPERATING_MODE, mode)
 
     def find_device(self):
-        """Make the device emit an annoying chirp so you can find it"""
+        """Make the device emit an annoying chirp so you can find it."""
         self.set_property_value(Properties.FIND_DEVICE, 1)
 
     async def async_find_device(self):
-        """Make the device emit an annoying chirp so you can find it"""
+        """Make the device emit an annoying chirp so you can find it."""
         await self.async_set_property_value(Properties.FIND_DEVICE, 1)
 
     @property
     def error_code(self) -> Optional[int]:
-        """Error code"""
+        """
+        Error code.
+
+        Returns:
+            The error code.
+        """
         return self.get_property_value(Properties.ERROR_CODE)
 
     @property
     def error_text(self) -> Optional[str]:
-        """Error message"""
+        """
+        Error message.
+        
+        Returns:
+            The error message.
+        """
         err = self.error_code
         if err:
             return ERROR_MESSAGES.get(err, f'Unknown error ({err})')
@@ -281,7 +450,16 @@ class SharkIqVacuum:
 
     @staticmethod
     def _get_most_recent_datum(data_list: List[Dict], date_field: str = 'updated_at') -> Dict:
-        """Get the most recent data point from a list of annoyingly nested values"""
+        """
+        Get the most recent data point from a list of annoyingly nested values.
+        
+        Args:
+            data_list: The list of data points.
+            date_field: The field to use for the date.
+            
+        Returns:
+            The most recent data point.
+        """
         datapoints = {
             _parse_datetime(d['datapoint'][date_field]): d['datapoint'] for d in data_list if 'datapoint' in d
         }
@@ -291,7 +469,15 @@ class SharkIqVacuum:
         return latest_datum
 
     def _get_file_property_endpoint(self, property_name: PropertyName) -> str:
-        """Check that property_name is a file property and return its lookup endpoint"""
+        """
+        Check that property_name is a file property and return its lookup endpoint.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The endpoint.
+        """
         if isinstance(property_name, enum.Enum):
             property_name = property_name.value
 
@@ -301,7 +487,15 @@ class SharkIqVacuum:
         return f'{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/properties/{property_id:d}/datapoints.json'
 
     def get_file_property_url(self, property_name: PropertyName) -> Optional[str]:
-        """File properties are versioned and need a special lookup"""
+        """
+        File properties are versioned and need a special lookup.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The URL.
+        """
         try:
             url = self._get_file_property_endpoint(property_name)
         except KeyError:
@@ -313,7 +507,15 @@ class SharkIqVacuum:
         return latest_datum.get('file')
 
     async def async_get_file_property_url(self, property_name: PropertyName) -> Optional[str]:
-        """File properties are versioned and need a special lookup"""
+        """
+        File properties are versioned and need a special lookup.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The URL.
+        """
         try:
             url = self._get_file_property_endpoint(property_name)
         except KeyError:
@@ -325,21 +527,45 @@ class SharkIqVacuum:
         return latest_datum.get('file')
 
     def get_file_property(self, property_name: PropertyName) -> bytes:
-        """Get the latest file for a file property and return as bytes"""
+        """
+        Get the latest file for a file property and return as bytes.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The file as bytes.
+        """
         # These do not require authentication, so we won't use the ayla_api
         url = self.get_file_property_url(property_name)
         resp = requests.get(url)
         return resp.content
 
     async def async_get_file_property(self, property_name: PropertyName) -> bytes:
-        """Get the latest file for a file property and return as bytes"""
+        """
+        Get the latest file for a file property and return as bytes.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The file as bytes.
+        """
         url = await self.async_get_file_property_url(property_name)
         session = self.ayla_api.websession
         async with session.get(url) as resp:
             return await resp.read()
 
     def _encode_room_list(self, rooms: List[str]):
-        """Base64 encode the list of rooms to clean"""
+        """
+        Base64 encode the list of rooms to clean.
+        
+        Args:
+            rooms: The list of rooms.
+            
+        Returns:
+            The base64 encoded list of rooms.
+        """
         if not rooms:
             raise ValueError('Room list must not be empty')
         if len(rooms) > 3:
@@ -349,6 +575,12 @@ class SharkIqVacuum:
         footer = b'\x1a\x08155B43C4'
 
     def clean_rooms(self, rooms: List[str]) -> None:
+        """
+        Clean the given rooms.
+
+        Args:
+            rooms: The list of rooms to clean.
+        """
         payload = self._encode_room_list(rooms)
         raise NotImplementedError
 
@@ -358,7 +590,16 @@ class SharkPropertiesView(abc.Mapping):
 
     @staticmethod
     def _cast_value(value, value_type):
-        """Cast property value to the appropriate type."""
+        """
+        Cast property value to the appropriate type.
+
+        Args:
+            value: The value to cast.
+            value_type: The type to cast to.
+
+        Returns:
+            The cast value.
+        """
         if value is None:
             return None
         type_map = {
@@ -370,9 +611,24 @@ class SharkPropertiesView(abc.Mapping):
         return type_map.get(value_type, lambda x: x)(value)
 
     def __init__(self, shark: SharkIqVacuum):
+        """
+        Initialize the shark properties view.
+        
+        Args:
+            shark: The shark iq vacuum.
+        """
         self._shark = shark
 
     def __getitem__(self, key):
+        """
+        Get a property value.
+
+        Args:
+            key: The property name.
+
+        Returns:
+            The property value.
+        """
         value = self._shark.properties_full[key].get('value')
         value_type = self._shark.properties_full[key].get('base_type')
         try:
@@ -383,11 +639,14 @@ class SharkPropertiesView(abc.Mapping):
             return value
 
     def __iter__(self):
+        """Iterate over the properties."""
         for k in self._shark.properties_full.keys():
             yield k
 
     def __len__(self) -> int:
+        """Return the number of properties."""
         return self._shark.properties_full.__len__()
 
     def __str__(self) -> str:
+        """Return a string representation of the properties."""
         return pformat(dict(self))
