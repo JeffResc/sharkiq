@@ -141,7 +141,8 @@ class SharkIqVacuum:
         return f'{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/data.json'
 
     def _update_metadata(self, metadata: List[Dict]):
-        if data := [d['datum'] for d in metadata if d.get('datum', {}).get('key', '') == 'sharkDeviceMobileData']:
+        data = [d['datum'] for d in metadata if d.get('datum', {}).get('key', '') == 'sharkDeviceMobileData']
+        if data:
             datum = data[0]
             # I do not know why they don't just use multiple keys for this
             try:
