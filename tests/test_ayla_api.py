@@ -78,8 +78,8 @@ class TestAylaApi:
         assert e.value.args[0] == "Unauthorized"
 
     def test_set_credentials__valid_response(self, dummy_api):
-        assert dummy_api._access_token is "token123"
-        assert dummy_api._refresh_token is "token321"
+        assert dummy_api._access_token == "token123"
+        assert dummy_api._refresh_token == "token321"
         assert dummy_api._auth_expiration.timestamp() == pytest.approx(
             (datetime.now() + timedelta(seconds=700)).timestamp()
         )
