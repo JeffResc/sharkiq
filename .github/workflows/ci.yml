@@ -1,5 +1,5 @@
 ---
-name: Code Coverage
+name: Continuous Integration
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Code Coverage (Python ${{ matrix.python-version }} on ${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
