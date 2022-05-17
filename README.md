@@ -85,7 +85,7 @@ Class for interacting with the Ayla Networks Device API underlying the Shark IQ 
  * `sign_out()`/`async_sign_out()` Sign out
 
 
-### `class SharkIqRobot(ayla_api, device_dct)`
+### `class SharkIqVacuum(ayla_api, device_dct)`
 Primary API for interacting with Shark IQ vacuums
  * `ayla_api: AylaApi` An `AylaApi` with an authenticated connection
  * `device_dct: Dict` A `dict` describing the device, usually obtained from `AylaApi.list_devices()`
@@ -110,6 +110,8 @@ Primary API for interacting with Shark IQ vacuums
  * `update()`/`async_update(property_list=None)` Fetch the updated robot state from the remote api
    * `property_list: Optional[Interable[str]]` An optional iterable of property names.  If specified, only those 
    properties will be updated.
+ * `get_room_list()` Get a list of known room `str`s
+ * `clean_rooms(List[str])` Start cleaning a subset of rooms
  
 #### Properties
  * `ayla_api` The underlying `AylaApi` object
@@ -134,7 +136,7 @@ Primary API for interacting with Shark IQ vacuums
 
 
 ### TODOs:
- * Add support for mapping and room selection
+ * Add support for mapping
  * Once we have mapping, it may be possible to use the RSSI property combined with an increased update frequency
  to generate a wifi strength heatmap.  Kind of orthogonal to the main purpose, but I really want to do this.
  
