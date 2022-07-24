@@ -405,6 +405,12 @@ class SharkIqVacuum:
         self.set_property_value(Properties.AREAS_TO_CLEAN, payload)
         self.set_operating_mode(OperatingModes.START)
 
+    async def async_clean_rooms(self, rooms: List[str]) -> None:
+        payload = self._encode_room_list(rooms)
+        _LOGGER.debug("Room list payload: " + payload)
+        await self.async_set_property_value(Properties.AREAS_TO_CLEAN, payload)
+        await self.async_set_operating_mode(OperatingModes.START)
+
 
 class SharkPropertiesView(abc.Mapping):
     """Convenience API for shark iq properties"""
