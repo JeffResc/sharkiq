@@ -87,6 +87,7 @@ ERROR_MESSAGES = {
     14: "Magnetic strip error",
     16: "Top bumper is stuck",
     18: "Wheel encoder error",
+    40: "Dustbin is blocked",
 }
 
 
