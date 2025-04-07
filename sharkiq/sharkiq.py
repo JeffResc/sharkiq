@@ -640,6 +640,12 @@ class SharkIqVacuum:
         self.set_operating_mode(OperatingModes.START)
 
     async def async_clean_rooms(self, rooms: List[str]) -> None:
+        """
+        Clean the given rooms.
+
+        Args:
+            rooms: The list of rooms to clean.
+        """
         payload = self._encode_room_list(rooms)
         _LOGGER.debug("Room list payload: " + payload)
         await self.async_set_property_value(Properties.AREAS_TO_CLEAN, payload)
