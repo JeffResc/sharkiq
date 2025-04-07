@@ -1,4 +1,4 @@
-"""Python API for Shark IQ vacuum robots"""
+"""Unofficial SDK for Shark IQ robot vacuums, designed primarily to support an integration for Home Assistant."""
 
 from .ayla_api import get_ayla_api, AylaApi
 from .exc import (
