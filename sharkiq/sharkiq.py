@@ -77,6 +77,7 @@ class Properties(enum.Enum):
     Useful properties.
     
     Attributes:
+        AREAS_TO_CLEAN: Areas to clean.
         BATTERY_CAPACITY: Battery capacity.
         CHARGING_STATUS: Charging status.
         CLEAN_COMPLETE: Cleaning complete.
@@ -94,6 +95,7 @@ class Properties(enum.Enum):
         ROBOT_FIRMWARE_VERSION: Robot firmware version.
         RSSI: RSSI.
     """
+    AREAS_TO_CLEAN = "Areas_To_Clean"
     BATTERY_CAPACITY = "Battery_Capacity"
     CHARGING_STATUS = "Charging_Status"
     CLEAN_COMPLETE = "CleanComplete"
@@ -109,6 +111,7 @@ class Properties(enum.Enum):
     RECHARGE_RESUME = "Recharge_Resume"
     RECHARGING_TO_RESUME = "Recharging_To_Resume"
     ROBOT_FIRMWARE_VERSION = "Robot_Firmware_Version"
+    ROBOT_ROOM_LIST = "Robot_Room_List"
     RSSI = "RSSI"
 
 
@@ -128,6 +131,7 @@ ERROR_MESSAGES = {
     14: "Magnetic strip error",
     16: "Top bumper is stuck",
     18: "Wheel encoder error",
+    40: "Dustbin is blocked",
 }
 
 
@@ -567,12 +571,61 @@ class SharkIqVacuum:
             The base64 encoded list of rooms.
         """
         if not rooms:
-            raise ValueError('Room list must not be empty')
-        if len(rooms) > 3:
-            raise ValueError('At most three rooms may be given')
-        # These are a mystery to me, but they seem constant
-        header = b'\x80\x01\x0b\xca\x02'
-        footer = b'\x1a\x08155B43C4'
+            # By default, clean all rooms
+            return '*'
+
+        room_list = self._get_device_room_list()
+        _LOGGER.debug(f'Room list identifier is: {room_list["identifier"]}')
+
+        # Header explained:
+        # 0x80: Control character - some mode selection
+        # 0x01: Start of Heading Character
+        # 0x0B: Use Line Tabulation (entries separated by newlines)
+        # 0xca: Control character - purpose unknown
+        # 0x02: Start of text (indicates start of room list)
+        header = '\x80\x01\x0b\xca\x02'
+
+        # For each room in the list:
+        # - Insert a byte representing the length of the room name string
+        # - Add the room name
+        # - Join with newlines (presumably because of the 0x0B in the header)
+        rooms_enc = "\n".join([chr(len(room)) + room for room in rooms])
+
+        # The footer starts with control character 0x1A
+        # Then add the length indicator for the room list identifier
+        # Then add the room list identifier
+        footer = '\x1a' + chr(len(room_list['identifier'])) + room_list['identifier']
+
+        # Now that we've computed the room list and footer and know their lengths, finish building the header
+        # This character denotes the length of the remaining input
+        header += chr(0
+                      + 1  # Add one for a newline following the length specifier
+                      + len(rooms_enc)
+                      + len(footer)
+                      )
+        header += '\n'  # This is the newline reference above
+
+        # Finally, join and base64 encode the parts
+        return base64.b64encode(
+            # First encode the string as latin_1 to get the right endianness
+            (header + rooms_enc + footer).encode('latin_1')
+            # Then return as a utf8 string for ease of handling
+        ).decode('utf8')
+
+    def _get_device_room_list(self):
+        """Gets the list of known rooms from the device, including the map identifier"""
+        room_list = self.get_property_value(Properties.ROBOT_ROOM_LIST)
+        split = room_list.split(':')
+        return {
+            # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
+            # onboard map in the robot
+            'identifier': split[0],
+            'rooms': split[1:],
+        }
+
+    def get_room_list(self) -> List[str]:
+        """Gets the list of rooms known by the device"""
+        return self._get_device_room_list()['rooms']
 
     def clean_rooms(self, rooms: List[str]) -> None:
         """
@@ -582,7 +635,15 @@ class SharkIqVacuum:
             rooms: The list of rooms to clean.
         """
         payload = self._encode_room_list(rooms)
-        raise NotImplementedError
+        _LOGGER.debug('Room list payload: ' + payload)
+        self.set_property_value(Properties.AREAS_TO_CLEAN, payload)
+        self.set_operating_mode(OperatingModes.START)
+
+    async def async_clean_rooms(self, rooms: List[str]) -> None:
+        payload = self._encode_room_list(rooms)
+        _LOGGER.debug("Room list payload: " + payload)
+        await self.async_set_property_value(Properties.AREAS_TO_CLEAN, payload)
+        await self.async_set_operating_mode(OperatingModes.START)
 
 
 class SharkPropertiesView(abc.Mapping):
