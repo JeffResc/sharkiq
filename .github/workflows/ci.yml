@@ -46,9 +46,9 @@ jobs:
     needs: [test]
     steps:
     - name: Checking out code from GitHub
-      uses: actions/checkout@v2.3.4
+      uses: actions/checkout@v4.2.2
     - name: Set up Python 3.13
-      uses: actions/setup-python@v2.2.2
+      uses: actions/setup-python@v5.5.0
       with:
         python-version: 3.13
     - name: Install dependencies
