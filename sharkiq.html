@@ -1,0 +1,1752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>sharkiq.sharkiq API documentation</title>
+<meta name="description" content="Shark IQ Wrapper.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>sharkiq.sharkiq</code></h1>
+</header>
+<section id="section-intro">
+<p>Shark IQ Wrapper.</p>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="sharkiq.sharkiq.OperatingModes"><code class="flex name class">
+<span>class <span class="ident">OperatingModes</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@enum.unique
+class OperatingModes(enum.IntEnum):
+    &#34;&#34;&#34;
+    Vacuum operation modes.
+
+    Attributes:
+        STOP: Stopped.
+        PAUSE: Paused.
+        START: Started.
+        RETURN: Returning.
+    &#34;&#34;&#34;
+    STOP = 0
+    PAUSE = 1
+    START = 2
+    RETURN = 3</code></pre>
+</details>
+<div class="desc"><p>Vacuum operation modes.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>STOP</code></strong></dt>
+<dd>Stopped.</dd>
+<dt><strong><code>PAUSE</code></strong></dt>
+<dd>Paused.</dd>
+<dt><strong><code>START</code></strong></dt>
+<dd>Started.</dd>
+<dt><strong><code>RETURN</code></strong></dt>
+<dd>Returning.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="sharkiq.sharkiq.OperatingModes.PAUSE"><code class="name">var <span class="ident">PAUSE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.OperatingModes.RETURN"><code class="name">var <span class="ident">RETURN</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.OperatingModes.START"><code class="name">var <span class="ident">START</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.OperatingModes.STOP"><code class="name">var <span class="ident">STOP</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="sharkiq.sharkiq.PowerModes"><code class="flex name class">
+<span>class <span class="ident">PowerModes</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@enum.unique
+class PowerModes(enum.IntEnum):
+    &#34;&#34;&#34;
+    Vacuum power modes.
+
+    Attributes:
+        ECO: Eco mode.
+        NORMAL: Normal mode.
+        MAX: Max mode.
+    &#34;&#34;&#34;
+    ECO = 1
+    NORMAL = 0
+    MAX = 2</code></pre>
+</details>
+<div class="desc"><p>Vacuum power modes.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>ECO</code></strong></dt>
+<dd>Eco mode.</dd>
+<dt><strong><code>NORMAL</code></strong></dt>
+<dd>Normal mode.</dd>
+<dt><strong><code>MAX</code></strong></dt>
+<dd>Max mode.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="sharkiq.sharkiq.PowerModes.ECO"><code class="name">var <span class="ident">ECO</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.PowerModes.MAX"><code class="name">var <span class="ident">MAX</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.PowerModes.NORMAL"><code class="name">var <span class="ident">NORMAL</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="sharkiq.sharkiq.Properties"><code class="flex name class">
+<span>class <span class="ident">Properties</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@enum.unique
+class Properties(enum.Enum):
+    &#34;&#34;&#34;
+    Useful properties.
+    
+    Attributes:
+        AREAS_TO_CLEAN: Areas to clean.
+        BATTERY_CAPACITY: Battery capacity.
+        CHARGING_STATUS: Charging status.
+        CLEAN_COMPLETE: Cleaning complete.
+        CLEANING_STATISTICS: Cleaning statistics.
+        DOCKED_STATUS: Docked status.
+        ERROR_CODE: Error code.
+        EVACUATING: Evacuating.
+        FIND_DEVICE: Find device.
+        LOW_LIGHT_MISSION: Low light mission.
+        NAV_MODULE_FW_VERSION: Nav module firmware version.
+        OPERATING_MODE: Operating mode.
+        POWER_MODE: Power mode.
+        RECHARGE_RESUME: Recharge resume.
+        RECHARGING_TO_RESUME: Recharging to resume.
+        ROBOT_FIRMWARE_VERSION: Robot firmware version.
+        RSSI: RSSI.
+    &#34;&#34;&#34;
+    AREAS_TO_CLEAN = &#34;Areas_To_Clean&#34;
+    BATTERY_CAPACITY = &#34;Battery_Capacity&#34;
+    CHARGING_STATUS = &#34;Charging_Status&#34;
+    CLEAN_COMPLETE = &#34;CleanComplete&#34;
+    CLEANING_STATISTICS = &#34;Cleaning_Statistics&#34;
+    DOCKED_STATUS = &#34;DockedStatus&#34;
+    ERROR_CODE = &#34;Error_Code&#34;
+    EVACUATING = &#34;Evacuating&#34;  # Doesn&#39;t really work because update frequency on the dock (default 20s) is too slow
+    FIND_DEVICE = &#34;Find_Device&#34;
+    LOW_LIGHT_MISSION = &#34;LowLightMission&#34;
+    NAV_MODULE_FW_VERSION = &#34;Nav_Module_FW_Version&#34;
+    OPERATING_MODE = &#34;Operating_Mode&#34;
+    POWER_MODE = &#34;Power_Mode&#34;
+    RECHARGE_RESUME = &#34;Recharge_Resume&#34;
+    RECHARGING_TO_RESUME = &#34;Recharging_To_Resume&#34;
+    ROBOT_FIRMWARE_VERSION = &#34;Robot_Firmware_Version&#34;
+    ROBOT_ROOM_LIST = &#34;Robot_Room_List&#34;
+    RSSI = &#34;RSSI&#34;</code></pre>
+</details>
+<div class="desc"><p>Useful properties.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>AREAS_TO_CLEAN</code></strong></dt>
+<dd>Areas to clean.</dd>
+<dt><strong><code>BATTERY_CAPACITY</code></strong></dt>
+<dd>Battery capacity.</dd>
+<dt><strong><code>CHARGING_STATUS</code></strong></dt>
+<dd>Charging status.</dd>
+<dt><strong><code>CLEAN_COMPLETE</code></strong></dt>
+<dd>Cleaning complete.</dd>
+<dt><strong><code>CLEANING_STATISTICS</code></strong></dt>
+<dd>Cleaning statistics.</dd>
+<dt><strong><code>DOCKED_STATUS</code></strong></dt>
+<dd>Docked status.</dd>
+<dt><strong><code>ERROR_CODE</code></strong></dt>
+<dd>Error code.</dd>
+<dt><strong><code>EVACUATING</code></strong></dt>
+<dd>Evacuating.</dd>
+<dt><strong><code>FIND_DEVICE</code></strong></dt>
+<dd>Find device.</dd>
+<dt><strong><code>LOW_LIGHT_MISSION</code></strong></dt>
+<dd>Low light mission.</dd>
+<dt><strong><code>NAV_MODULE_FW_VERSION</code></strong></dt>
+<dd>Nav module firmware version.</dd>
+<dt><strong><code>OPERATING_MODE</code></strong></dt>
+<dd>Operating mode.</dd>
+<dt><strong><code>POWER_MODE</code></strong></dt>
+<dd>Power mode.</dd>
+<dt><strong><code>RECHARGE_RESUME</code></strong></dt>
+<dd>Recharge resume.</dd>
+<dt><strong><code>RECHARGING_TO_RESUME</code></strong></dt>
+<dd>Recharging to resume.</dd>
+<dt><strong><code>ROBOT_FIRMWARE_VERSION</code></strong></dt>
+<dd>Robot firmware version.</dd>
+<dt><strong><code>RSSI</code></strong></dt>
+<dd>RSSI.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="sharkiq.sharkiq.Properties.AREAS_TO_CLEAN"><code class="name">var <span class="ident">AREAS_TO_CLEAN</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.BATTERY_CAPACITY"><code class="name">var <span class="ident">BATTERY_CAPACITY</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.CHARGING_STATUS"><code class="name">var <span class="ident">CHARGING_STATUS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.CLEANING_STATISTICS"><code class="name">var <span class="ident">CLEANING_STATISTICS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.CLEAN_COMPLETE"><code class="name">var <span class="ident">CLEAN_COMPLETE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.DOCKED_STATUS"><code class="name">var <span class="ident">DOCKED_STATUS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.ERROR_CODE"><code class="name">var <span class="ident">ERROR_CODE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.EVACUATING"><code class="name">var <span class="ident">EVACUATING</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.FIND_DEVICE"><code class="name">var <span class="ident">FIND_DEVICE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.LOW_LIGHT_MISSION"><code class="name">var <span class="ident">LOW_LIGHT_MISSION</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.NAV_MODULE_FW_VERSION"><code class="name">var <span class="ident">NAV_MODULE_FW_VERSION</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.OPERATING_MODE"><code class="name">var <span class="ident">OPERATING_MODE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.POWER_MODE"><code class="name">var <span class="ident">POWER_MODE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.RECHARGE_RESUME"><code class="name">var <span class="ident">RECHARGE_RESUME</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.RECHARGING_TO_RESUME"><code class="name">var <span class="ident">RECHARGING_TO_RESUME</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.ROBOT_FIRMWARE_VERSION"><code class="name">var <span class="ident">ROBOT_FIRMWARE_VERSION</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.ROBOT_ROOM_LIST"><code class="name">var <span class="ident">ROBOT_ROOM_LIST</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.Properties.RSSI"><code class="name">var <span class="ident">RSSI</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum"><code class="flex name class">
+<span>class <span class="ident">SharkIqVacuum</span></span>
+<span>(</span><span>ayla_api: AylaApi, device_dct: Dict, europe: bool = False)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SharkIqVacuum:
+    &#34;&#34;&#34;Shark IQ vacuum entity.&#34;&#34;&#34;
+
+    def __init__(self, ayla_api: &#34;AylaApi&#34;, device_dct: Dict, europe: bool = False):
+        &#34;&#34;&#34;
+        Initialize a SharkIqVacuum object.
+
+        Args:
+            ayla_api: The AylaApi object.
+            device_dct: The device dictionary.
+            europe: True if the account is registered in Europe.
+        &#34;&#34;&#34;
+        self.ayla_api = ayla_api
+        self._dsn = device_dct[&#39;dsn&#39;]
+        self._key = device_dct[&#39;key&#39;]
+        self._oem_model_number = device_dct[&#39;oem_model&#39;]  # type: str
+        self._vac_model_number = None  # type: Optional[str]
+        self._vac_serial_number = None  # type: Optional[str]
+        self.properties_full = defaultdict(dict)  # Using a defaultdict prevents errors before calling `update()`
+        self.property_values = SharkPropertiesView(self)
+        self._settable_properties = None  # type: Optional[Set]
+        self.europe = europe
+
+        # Properties
+        self._name = device_dct[&#39;product_name&#39;]
+        self._error = None
+
+    @property
+    def oem_model_number(self) -&gt; str:
+        &#34;&#34;&#34;
+        The OEM model number.
+        
+        Returns:
+            The OEM model number.
+        &#34;&#34;&#34;
+        return self._oem_model_number
+
+    @property
+    def vac_model_number(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;
+        The vacuum model number.
+
+        Returns:
+            The vacuum model number.
+        &#34;&#34;&#34;
+        return self._vac_model_number
+
+    @property
+    def vac_serial_number(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;
+        The vacuum serial number.
+
+        Returns:
+            The vacuum serial number.
+        &#34;&#34;&#34;
+        return self._vac_serial_number
+
+    @property
+    def name(self):
+        &#34;&#34;&#34;
+        The vacuum name.
+
+        Returns:
+            The vacuum name.
+        &#34;&#34;&#34;
+        return self._name
+
+    @property
+    def serial_number(self) -&gt; str:
+        &#34;&#34;&#34;
+        The vacuum serial number.
+
+        Returns:
+            The vacuum serial number.
+        &#34;&#34;&#34;
+        return self._dsn
+
+    @property
+    def metadata_endpoint(self) -&gt; str:
+        &#34;&#34;&#34;
+        Endpoint for device metadata.
+
+        Returns:
+            The endpoint for device metadata.
+        &#34;&#34;&#34;
+        return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/data.json&#39;
+
+    def _update_metadata(self, metadata: List[Dict]):
+        &#34;&#34;&#34;
+        Update metadata.
+
+        Args:
+            metadata: The metadata.
+        &#34;&#34;&#34;
+        data = [d[&#39;datum&#39;] for d in metadata if d.get(&#39;datum&#39;, {}).get(&#39;key&#39;, &#39;&#39;) == &#39;sharkDeviceMobileData&#39;]
+        if data:
+            datum = data[0]
+            # I do not know why they don&#39;t just use multiple keys for this
+            try:
+                values = json.loads(datum.get(&#39;value&#39;))
+            except ValueError:
+                values = {}
+            self._vac_model_number = values.get(&#39;vacModelNumber&#39;)
+            self._vac_serial_number = values.get(&#39;vacSerialNumber&#39;)
+
+    def get_metadata(self):
+        &#34;&#34;&#34;Fetch device metadata. Not needed for basic operation.&#34;&#34;&#34;
+        resp = self.ayla_api.request(&#39;get&#39;, self.metadata_endpoint)
+        self._update_metadata(resp.json())
+
+    async def async_get_metadata(self):
+        &#34;&#34;&#34;Fetch device metadata. Not needed for basic operation.&#34;&#34;&#34;
+        async with await self.ayla_api.async_request(&#39;get&#39;, self.metadata_endpoint) as resp:
+            resp_data = await resp.json()
+        self._update_metadata(resp_data)
+
+    def set_property_endpoint(self, property_name) -&gt; str:
+        &#34;&#34;&#34;
+        Get the API endpoint for a given property.
+        
+        Args:
+            property_name: The property name.
+        
+        Returns:
+            The API endpoint.
+        &#34;&#34;&#34;
+        return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/properties/{property_name:s}/datapoints.json&#39;
+
+    def get_property_value(self, property_name: PropertyName) -&gt; Any:
+        &#34;&#34;&#34;
+        Get the value of a property from the properties dictionary.
+        
+        Args:
+            property_name: The property name.
+        
+        Returns:
+            The property value.
+        &#34;&#34;&#34;
+        if isinstance(property_name, enum.Enum):
+            property_name = property_name.value
+        return self.property_values[property_name]
+
+    def set_property_value(self, property_name: PropertyName, value: PropertyValue):
+        &#34;&#34;&#34;
+        Update a property.
+
+        Args:
+            property_name: The property name.
+            value: The property value.
+        &#34;&#34;&#34;
+        if isinstance(property_name, enum.Enum):
+            property_name = property_name.value
+        if isinstance(value, enum.Enum):
+            value = value.value
+        if self.properties_full.get(property_name, {}).get(&#39;read_only&#39;):
+            raise SharkIqReadOnlyPropertyError(f&#39;{property_name} is read only&#39;)
+
+        end_point = self.set_property_endpoint(f&#39;SET_{property_name}&#39;)
+        data = {&#39;datapoint&#39;: {&#39;value&#39;: value}}
+        resp = self.ayla_api.request(&#39;post&#39;, end_point, json=data)
+        self.properties_full[property_name].update(resp.json())
+
+    async def async_set_property_value(self, property_name: PropertyName, value: PropertyValue):
+        &#34;&#34;&#34;
+        Update a property async.
+
+        Args:
+            property_name: The property name.
+            value: The property value.
+        &#34;&#34;&#34;
+        if isinstance(property_name, enum.Enum):
+            property_name = property_name.value
+        if isinstance(value, enum.Enum):
+            value = value.value
+
+        end_point = self.set_property_endpoint(f&#39;SET_{property_name}&#39;)
+        data = {&#39;datapoint&#39;: {&#39;value&#39;: value}}
+        async with await self.ayla_api.async_request(&#39;post&#39;, end_point, json=data) as resp:
+            resp_data = await resp.json()
+        self.properties_full[property_name].update(resp_data)
+
+    @property
+    def update_url(self) -&gt; str:
+        &#34;&#34;&#34;
+        API endpoint to fetch updated device information.
+        
+        Returns:
+            The API endpoint.
+        &#34;&#34;&#34;
+        return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL}/apiv1/dsns/{self.serial_number}/properties.json&#39;
+
+    def update(self, property_list: Optional[Iterable[str]] = None):
+        &#34;&#34;&#34;
+        Update the known device state.
+
+        Args:
+            property_list: The list of properties to update.
+        &#34;&#34;&#34;
+        full_update = property_list is None
+        if full_update:
+            params = None
+        else:
+            params = {&#39;names[]&#39;: property_list}
+
+        resp = self.ayla_api.request(&#39;get&#39;, self.update_url, params=params)
+        properties = resp.json()
+        self._do_update(full_update, properties)
+
+    async def async_update(self, property_list: Optional[Iterable[str]] = None):
+        &#34;&#34;&#34;
+        Update the known device state async.
+        
+        Args:
+            property_list: The list of properties to update.
+        &#34;&#34;&#34;
+        full_update = property_list is None
+        if full_update:
+            params = None
+        else:
+            params = {&#39;names[]&#39;: property_list}
+
+        async with await self.ayla_api.async_request(&#39;get&#39;, self.update_url, params=params) as resp:
+            properties = await resp.json()
+
+        self._do_update(full_update, properties)
+
+    def _do_update(self, full_update: bool, properties: List[Dict]):
+        &#34;&#34;&#34;
+        Update the internal state from fetched properties.
+        
+        Args:
+            full_update: Whether to update all properties.
+            properties: The properties.
+        &#34;&#34;&#34;
+        property_names = {p[&#39;property&#39;][&#39;name&#39;] for p in properties}
+        settable_properties = {_clean_property_name(p) for p in property_names if p[:3].upper() == &#39;SET&#39;}
+        readable_properties = {
+            _clean_property_name(p[&#39;property&#39;][&#39;name&#39;]): p[&#39;property&#39;]
+            for p in properties if p[&#39;property&#39;][&#39;name&#39;].upper() != &#39;SET&#39;
+        }
+
+        if full_update or self._settable_properties is None:
+            self._settable_properties = settable_properties
+        else:
+            self._settable_properties = self._settable_properties.union(settable_properties)
+
+        # Update the property map so we can update by name instead of by fickle number
+        if full_update:
+            # Did a full update, so let&#39;s wipe everything
+            self.properties_full = defaultdict(dict)
+        self.properties_full.update(readable_properties)
+
+    def set_operating_mode(self, mode: OperatingModes):
+        &#34;&#34;&#34;
+        Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+        
+        Args:
+            mode: The operating mode.
+        &#34;&#34;&#34;
+        self.set_property_value(Properties.OPERATING_MODE, mode)
+
+    async def async_set_operating_mode(self, mode: OperatingModes):
+        &#34;&#34;&#34;
+        Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+        
+        Args:
+            mode: The operating mode.
+        &#34;&#34;&#34;
+        await self.async_set_property_value(Properties.OPERATING_MODE, mode)
+
+    def find_device(self):
+        &#34;&#34;&#34;Make the device emit an annoying chirp so you can find it.&#34;&#34;&#34;
+        self.set_property_value(Properties.FIND_DEVICE, 1)
+
+    async def async_find_device(self):
+        &#34;&#34;&#34;Make the device emit an annoying chirp so you can find it.&#34;&#34;&#34;
+        await self.async_set_property_value(Properties.FIND_DEVICE, 1)
+
+    @property
+    def error_code(self) -&gt; Optional[int]:
+        &#34;&#34;&#34;
+        Error code.
+
+        Returns:
+            The error code.
+        &#34;&#34;&#34;
+        return self.get_property_value(Properties.ERROR_CODE)
+
+    @property
+    def error_text(self) -&gt; Optional[str]:
+        &#34;&#34;&#34;
+        Error message.
+        
+        Returns:
+            The error message.
+        &#34;&#34;&#34;
+        err = self.error_code
+        if err:
+            return ERROR_MESSAGES.get(err, f&#39;Unknown error ({err})&#39;)
+        return None
+
+    @staticmethod
+    def _get_most_recent_datum(data_list: List[Dict], date_field: str = &#39;updated_at&#39;) -&gt; Dict:
+        &#34;&#34;&#34;
+        Get the most recent data point from a list of annoyingly nested values.
+        
+        Args:
+            data_list: The list of data points.
+            date_field: The field to use for the date.
+            
+        Returns:
+            The most recent data point.
+        &#34;&#34;&#34;
+        datapoints = {
+            _parse_datetime(d[&#39;datapoint&#39;][date_field]): d[&#39;datapoint&#39;] for d in data_list if &#39;datapoint&#39; in d
+        }
+        if not datapoints:
+            return {}
+        latest_datum = datapoints[max(datapoints.keys())]
+        return latest_datum
+
+    def _get_file_property_endpoint(self, property_name: PropertyName) -&gt; str:
+        &#34;&#34;&#34;
+        Check that property_name is a file property and return its lookup endpoint.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The endpoint.
+        &#34;&#34;&#34;
+        if isinstance(property_name, enum.Enum):
+            property_name = property_name.value
+
+        property_id = self.properties_full[property_name][&#39;key&#39;]
+        if self.properties_full[property_name].get(&#39;base_type&#39;) != &#39;file&#39;:
+            raise ValueError(f&#39;{property_name} is not a file property&#39;)
+        return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/properties/{property_id:d}/datapoints.json&#39;
+
+    def get_file_property_url(self, property_name: PropertyName) -&gt; Optional[str]:
+        &#34;&#34;&#34;
+        File properties are versioned and need a special lookup.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The URL.
+        &#34;&#34;&#34;
+        try:
+            url = self._get_file_property_endpoint(property_name)
+        except KeyError:
+            return None
+
+        resp = self.ayla_api.request(&#39;get&#39;, url)
+        data_list = resp.json()
+        latest_datum = self._get_most_recent_datum(data_list)
+        return latest_datum.get(&#39;file&#39;)
+
+    async def async_get_file_property_url(self, property_name: PropertyName) -&gt; Optional[str]:
+        &#34;&#34;&#34;
+        File properties are versioned and need a special lookup.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The URL.
+        &#34;&#34;&#34;
+        try:
+            url = self._get_file_property_endpoint(property_name)
+        except KeyError:
+            return None
+
+        async with await self.ayla_api.async_request(&#39;get&#39;, url) as resp:
+            data_list = await resp.json()
+        latest_datum = self._get_most_recent_datum(data_list)
+        return latest_datum.get(&#39;file&#39;)
+
+    def get_file_property(self, property_name: PropertyName) -&gt; bytes:
+        &#34;&#34;&#34;
+        Get the latest file for a file property and return as bytes.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The file as bytes.
+        &#34;&#34;&#34;
+        # These do not require authentication, so we won&#39;t use the ayla_api
+        url = self.get_file_property_url(property_name)
+        resp = requests.get(url)
+        return resp.content
+
+    async def async_get_file_property(self, property_name: PropertyName) -&gt; bytes:
+        &#34;&#34;&#34;
+        Get the latest file for a file property and return as bytes.
+        
+        Args:
+            property_name: The property name.
+            
+        Returns:
+            The file as bytes.
+        &#34;&#34;&#34;
+        url = await self.async_get_file_property_url(property_name)
+        session = self.ayla_api.websession
+        async with session.get(url) as resp:
+            return await resp.read()
+
+    def _encode_room_list(self, rooms: List[str]):
+        &#34;&#34;&#34;
+        Base64 encode the list of rooms to clean.
+        
+        Args:
+            rooms: The list of rooms.
+            
+        Returns:
+            The base64 encoded list of rooms.
+        &#34;&#34;&#34;
+        if not rooms:
+            # By default, clean all rooms
+            return &#39;*&#39;
+
+        room_list = self._get_device_room_list()
+        _LOGGER.debug(f&#39;Room list identifier is: {room_list[&#34;identifier&#34;]}&#39;)
+
+        # Header explained:
+        # 0x80: Control character - some mode selection
+        # 0x01: Start of Heading Character
+        # 0x0B: Use Line Tabulation (entries separated by newlines)
+        # 0xca: Control character - purpose unknown
+        # 0x02: Start of text (indicates start of room list)
+        header = &#39;\x80\x01\x0b\xca\x02&#39;
+
+        # For each room in the list:
+        # - Insert a byte representing the length of the room name string
+        # - Add the room name
+        # - Join with newlines (presumably because of the 0x0B in the header)
+        rooms_enc = &#34;\n&#34;.join([chr(len(room)) + room for room in rooms])
+
+        # The footer starts with control character 0x1A
+        # Then add the length indicator for the room list identifier
+        # Then add the room list identifier
+        footer = &#39;\x1a&#39; + chr(len(room_list[&#39;identifier&#39;])) + room_list[&#39;identifier&#39;]
+
+        # Now that we&#39;ve computed the room list and footer and know their lengths, finish building the header
+        # This character denotes the length of the remaining input
+        header += chr(0
+                      + 1  # Add one for a newline following the length specifier
+                      + len(rooms_enc)
+                      + len(footer)
+                      )
+        header += &#39;\n&#39;  # This is the newline reference above
+
+        # Finally, join and base64 encode the parts
+        return base64.b64encode(
+            # First encode the string as latin_1 to get the right endianness
+            (header + rooms_enc + footer).encode(&#39;latin_1&#39;)
+            # Then return as a utf8 string for ease of handling
+        ).decode(&#39;utf8&#39;)
+
+    def _get_device_room_list(self):
+        &#34;&#34;&#34;Gets the list of known rooms from the device, including the map identifier&#34;&#34;&#34;
+        room_list = self.get_property_value(Properties.ROBOT_ROOM_LIST)
+        split = room_list.split(&#39;:&#39;)
+        return {
+            # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
+            # onboard map in the robot
+            &#39;identifier&#39;: split[0],
+            &#39;rooms&#39;: split[1:],
+        }
+
+    def get_room_list(self) -&gt; List[str]:
+        &#34;&#34;&#34;Gets the list of rooms known by the device&#34;&#34;&#34;
+        return self._get_device_room_list()[&#39;rooms&#39;]
+
+    def clean_rooms(self, rooms: List[str]) -&gt; None:
+        &#34;&#34;&#34;
+        Clean the given rooms.
+
+        Args:
+            rooms: The list of rooms to clean.
+        &#34;&#34;&#34;
+        payload = self._encode_room_list(rooms)
+        _LOGGER.debug(&#39;Room list payload: &#39; + payload)
+        self.set_property_value(Properties.AREAS_TO_CLEAN, payload)
+        self.set_operating_mode(OperatingModes.START)
+
+    async def async_clean_rooms(self, rooms: List[str]) -&gt; None:
+        &#34;&#34;&#34;
+        Clean the given rooms.
+
+        Args:
+            rooms: The list of rooms to clean.
+        &#34;&#34;&#34;
+        payload = self._encode_room_list(rooms)
+        _LOGGER.debug(&#34;Room list payload: &#34; + payload)
+        await self.async_set_property_value(Properties.AREAS_TO_CLEAN, payload)
+        await self.async_set_operating_mode(OperatingModes.START)</code></pre>
+</details>
+<div class="desc"><p>Shark IQ vacuum entity.</p>
+<p>Initialize a SharkIqVacuum object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>ayla_api</code></strong></dt>
+<dd>The AylaApi object.</dd>
+<dt><strong><code>device_dct</code></strong></dt>
+<dd>The device dictionary.</dd>
+<dt><strong><code>europe</code></strong></dt>
+<dd>True if the account is registered in Europe.</dd>
+</dl></div>
+<h3>Instance variables</h3>
+<dl>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.error_code"><code class="name">prop <span class="ident">error_code</span> : int | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def error_code(self) -&gt; Optional[int]:
+    &#34;&#34;&#34;
+    Error code.
+
+    Returns:
+        The error code.
+    &#34;&#34;&#34;
+    return self.get_property_value(Properties.ERROR_CODE)</code></pre>
+</details>
+<div class="desc"><p>Error code.</p>
+<h2 id="returns">Returns</h2>
+<p>The error code.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.error_text"><code class="name">prop <span class="ident">error_text</span> : str | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def error_text(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;
+    Error message.
+    
+    Returns:
+        The error message.
+    &#34;&#34;&#34;
+    err = self.error_code
+    if err:
+        return ERROR_MESSAGES.get(err, f&#39;Unknown error ({err})&#39;)
+    return None</code></pre>
+</details>
+<div class="desc"><p>Error message.</p>
+<h2 id="returns">Returns</h2>
+<p>The error message.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.metadata_endpoint"><code class="name">prop <span class="ident">metadata_endpoint</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def metadata_endpoint(self) -&gt; str:
+    &#34;&#34;&#34;
+    Endpoint for device metadata.
+
+    Returns:
+        The endpoint for device metadata.
+    &#34;&#34;&#34;
+    return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/data.json&#39;</code></pre>
+</details>
+<div class="desc"><p>Endpoint for device metadata.</p>
+<h2 id="returns">Returns</h2>
+<p>The endpoint for device metadata.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.name"><code class="name">prop <span class="ident">name</span></code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def name(self):
+    &#34;&#34;&#34;
+    The vacuum name.
+
+    Returns:
+        The vacuum name.
+    &#34;&#34;&#34;
+    return self._name</code></pre>
+</details>
+<div class="desc"><p>The vacuum name.</p>
+<h2 id="returns">Returns</h2>
+<p>The vacuum name.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.oem_model_number"><code class="name">prop <span class="ident">oem_model_number</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def oem_model_number(self) -&gt; str:
+    &#34;&#34;&#34;
+    The OEM model number.
+    
+    Returns:
+        The OEM model number.
+    &#34;&#34;&#34;
+    return self._oem_model_number</code></pre>
+</details>
+<div class="desc"><p>The OEM model number.</p>
+<h2 id="returns">Returns</h2>
+<p>The OEM model number.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.serial_number"><code class="name">prop <span class="ident">serial_number</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def serial_number(self) -&gt; str:
+    &#34;&#34;&#34;
+    The vacuum serial number.
+
+    Returns:
+        The vacuum serial number.
+    &#34;&#34;&#34;
+    return self._dsn</code></pre>
+</details>
+<div class="desc"><p>The vacuum serial number.</p>
+<h2 id="returns">Returns</h2>
+<p>The vacuum serial number.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.update_url"><code class="name">prop <span class="ident">update_url</span> : str</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def update_url(self) -&gt; str:
+    &#34;&#34;&#34;
+    API endpoint to fetch updated device information.
+    
+    Returns:
+        The API endpoint.
+    &#34;&#34;&#34;
+    return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL}/apiv1/dsns/{self.serial_number}/properties.json&#39;</code></pre>
+</details>
+<div class="desc"><p>API endpoint to fetch updated device information.</p>
+<h2 id="returns">Returns</h2>
+<p>The API endpoint.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.vac_model_number"><code class="name">prop <span class="ident">vac_model_number</span> : str | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def vac_model_number(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;
+    The vacuum model number.
+
+    Returns:
+        The vacuum model number.
+    &#34;&#34;&#34;
+    return self._vac_model_number</code></pre>
+</details>
+<div class="desc"><p>The vacuum model number.</p>
+<h2 id="returns">Returns</h2>
+<p>The vacuum model number.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.vac_serial_number"><code class="name">prop <span class="ident">vac_serial_number</span> : str | None</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def vac_serial_number(self) -&gt; Optional[str]:
+    &#34;&#34;&#34;
+    The vacuum serial number.
+
+    Returns:
+        The vacuum serial number.
+    &#34;&#34;&#34;
+    return self._vac_serial_number</code></pre>
+</details>
+<div class="desc"><p>The vacuum serial number.</p>
+<h2 id="returns">Returns</h2>
+<p>The vacuum serial number.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_clean_rooms"><code class="name flex">
+<span>async def <span class="ident">async_clean_rooms</span></span>(<span>self, rooms: List[str]) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_clean_rooms(self, rooms: List[str]) -&gt; None:
+    &#34;&#34;&#34;
+    Clean the given rooms.
+
+    Args:
+        rooms: The list of rooms to clean.
+    &#34;&#34;&#34;
+    payload = self._encode_room_list(rooms)
+    _LOGGER.debug(&#34;Room list payload: &#34; + payload)
+    await self.async_set_property_value(Properties.AREAS_TO_CLEAN, payload)
+    await self.async_set_operating_mode(OperatingModes.START)</code></pre>
+</details>
+<div class="desc"><p>Clean the given rooms.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rooms</code></strong></dt>
+<dd>The list of rooms to clean.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_find_device"><code class="name flex">
+<span>async def <span class="ident">async_find_device</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_find_device(self):
+    &#34;&#34;&#34;Make the device emit an annoying chirp so you can find it.&#34;&#34;&#34;
+    await self.async_set_property_value(Properties.FIND_DEVICE, 1)</code></pre>
+</details>
+<div class="desc"><p>Make the device emit an annoying chirp so you can find it.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_get_file_property"><code class="name flex">
+<span>async def <span class="ident">async_get_file_property</span></span>(<span>self, property_name: str | enum.Enum) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_get_file_property(self, property_name: PropertyName) -&gt; bytes:
+    &#34;&#34;&#34;
+    Get the latest file for a file property and return as bytes.
+    
+    Args:
+        property_name: The property name.
+        
+    Returns:
+        The file as bytes.
+    &#34;&#34;&#34;
+    url = await self.async_get_file_property_url(property_name)
+    session = self.ayla_api.websession
+    async with session.get(url) as resp:
+        return await resp.read()</code></pre>
+</details>
+<div class="desc"><p>Get the latest file for a file property and return as bytes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The file as bytes.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_get_file_property_url"><code class="name flex">
+<span>async def <span class="ident">async_get_file_property_url</span></span>(<span>self, property_name: str | enum.Enum) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_get_file_property_url(self, property_name: PropertyName) -&gt; Optional[str]:
+    &#34;&#34;&#34;
+    File properties are versioned and need a special lookup.
+    
+    Args:
+        property_name: The property name.
+        
+    Returns:
+        The URL.
+    &#34;&#34;&#34;
+    try:
+        url = self._get_file_property_endpoint(property_name)
+    except KeyError:
+        return None
+
+    async with await self.ayla_api.async_request(&#39;get&#39;, url) as resp:
+        data_list = await resp.json()
+    latest_datum = self._get_most_recent_datum(data_list)
+    return latest_datum.get(&#39;file&#39;)</code></pre>
+</details>
+<div class="desc"><p>File properties are versioned and need a special lookup.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The URL.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_get_metadata"><code class="name flex">
+<span>async def <span class="ident">async_get_metadata</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_get_metadata(self):
+    &#34;&#34;&#34;Fetch device metadata. Not needed for basic operation.&#34;&#34;&#34;
+    async with await self.ayla_api.async_request(&#39;get&#39;, self.metadata_endpoint) as resp:
+        resp_data = await resp.json()
+    self._update_metadata(resp_data)</code></pre>
+</details>
+<div class="desc"><p>Fetch device metadata. Not needed for basic operation.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_set_operating_mode"><code class="name flex">
+<span>async def <span class="ident">async_set_operating_mode</span></span>(<span>self,<br>mode: <a title="sharkiq.sharkiq.OperatingModes" href="#sharkiq.sharkiq.OperatingModes">OperatingModes</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_set_operating_mode(self, mode: OperatingModes):
+    &#34;&#34;&#34;
+    Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+    
+    Args:
+        mode: The operating mode.
+    &#34;&#34;&#34;
+    await self.async_set_property_value(Properties.OPERATING_MODE, mode)</code></pre>
+</details>
+<div class="desc"><p>Set the operating mode. This is just a convenience wrapper around <code>set_property_value</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>mode</code></strong></dt>
+<dd>The operating mode.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_set_property_value"><code class="name flex">
+<span>async def <span class="ident">async_set_property_value</span></span>(<span>self, property_name: str | enum.Enum, value: str | int | enum.Enum)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_set_property_value(self, property_name: PropertyName, value: PropertyValue):
+    &#34;&#34;&#34;
+    Update a property async.
+
+    Args:
+        property_name: The property name.
+        value: The property value.
+    &#34;&#34;&#34;
+    if isinstance(property_name, enum.Enum):
+        property_name = property_name.value
+    if isinstance(value, enum.Enum):
+        value = value.value
+
+    end_point = self.set_property_endpoint(f&#39;SET_{property_name}&#39;)
+    data = {&#39;datapoint&#39;: {&#39;value&#39;: value}}
+    async with await self.ayla_api.async_request(&#39;post&#39;, end_point, json=data) as resp:
+        resp_data = await resp.json()
+    self.properties_full[property_name].update(resp_data)</code></pre>
+</details>
+<div class="desc"><p>Update a property async.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+<dt><strong><code>value</code></strong></dt>
+<dd>The property value.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.async_update"><code class="name flex">
+<span>async def <span class="ident">async_update</span></span>(<span>self, property_list: Iterable[str] | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_update(self, property_list: Optional[Iterable[str]] = None):
+    &#34;&#34;&#34;
+    Update the known device state async.
+    
+    Args:
+        property_list: The list of properties to update.
+    &#34;&#34;&#34;
+    full_update = property_list is None
+    if full_update:
+        params = None
+    else:
+        params = {&#39;names[]&#39;: property_list}
+
+    async with await self.ayla_api.async_request(&#39;get&#39;, self.update_url, params=params) as resp:
+        properties = await resp.json()
+
+    self._do_update(full_update, properties)</code></pre>
+</details>
+<div class="desc"><p>Update the known device state async.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_list</code></strong></dt>
+<dd>The list of properties to update.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.clean_rooms"><code class="name flex">
+<span>def <span class="ident">clean_rooms</span></span>(<span>self, rooms: List[str]) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def clean_rooms(self, rooms: List[str]) -&gt; None:
+    &#34;&#34;&#34;
+    Clean the given rooms.
+
+    Args:
+        rooms: The list of rooms to clean.
+    &#34;&#34;&#34;
+    payload = self._encode_room_list(rooms)
+    _LOGGER.debug(&#39;Room list payload: &#39; + payload)
+    self.set_property_value(Properties.AREAS_TO_CLEAN, payload)
+    self.set_operating_mode(OperatingModes.START)</code></pre>
+</details>
+<div class="desc"><p>Clean the given rooms.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rooms</code></strong></dt>
+<dd>The list of rooms to clean.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.find_device"><code class="name flex">
+<span>def <span class="ident">find_device</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_device(self):
+    &#34;&#34;&#34;Make the device emit an annoying chirp so you can find it.&#34;&#34;&#34;
+    self.set_property_value(Properties.FIND_DEVICE, 1)</code></pre>
+</details>
+<div class="desc"><p>Make the device emit an annoying chirp so you can find it.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.get_file_property"><code class="name flex">
+<span>def <span class="ident">get_file_property</span></span>(<span>self, property_name: str | enum.Enum) ‑> bytes</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_file_property(self, property_name: PropertyName) -&gt; bytes:
+    &#34;&#34;&#34;
+    Get the latest file for a file property and return as bytes.
+    
+    Args:
+        property_name: The property name.
+        
+    Returns:
+        The file as bytes.
+    &#34;&#34;&#34;
+    # These do not require authentication, so we won&#39;t use the ayla_api
+    url = self.get_file_property_url(property_name)
+    resp = requests.get(url)
+    return resp.content</code></pre>
+</details>
+<div class="desc"><p>Get the latest file for a file property and return as bytes.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The file as bytes.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.get_file_property_url"><code class="name flex">
+<span>def <span class="ident">get_file_property_url</span></span>(<span>self, property_name: str | enum.Enum) ‑> str | None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_file_property_url(self, property_name: PropertyName) -&gt; Optional[str]:
+    &#34;&#34;&#34;
+    File properties are versioned and need a special lookup.
+    
+    Args:
+        property_name: The property name.
+        
+    Returns:
+        The URL.
+    &#34;&#34;&#34;
+    try:
+        url = self._get_file_property_endpoint(property_name)
+    except KeyError:
+        return None
+
+    resp = self.ayla_api.request(&#39;get&#39;, url)
+    data_list = resp.json()
+    latest_datum = self._get_most_recent_datum(data_list)
+    return latest_datum.get(&#39;file&#39;)</code></pre>
+</details>
+<div class="desc"><p>File properties are versioned and need a special lookup.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The URL.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.get_metadata"><code class="name flex">
+<span>def <span class="ident">get_metadata</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_metadata(self):
+    &#34;&#34;&#34;Fetch device metadata. Not needed for basic operation.&#34;&#34;&#34;
+    resp = self.ayla_api.request(&#39;get&#39;, self.metadata_endpoint)
+    self._update_metadata(resp.json())</code></pre>
+</details>
+<div class="desc"><p>Fetch device metadata. Not needed for basic operation.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.get_property_value"><code class="name flex">
+<span>def <span class="ident">get_property_value</span></span>(<span>self, property_name: str | enum.Enum) ‑> Any</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_property_value(self, property_name: PropertyName) -&gt; Any:
+    &#34;&#34;&#34;
+    Get the value of a property from the properties dictionary.
+    
+    Args:
+        property_name: The property name.
+    
+    Returns:
+        The property value.
+    &#34;&#34;&#34;
+    if isinstance(property_name, enum.Enum):
+        property_name = property_name.value
+    return self.property_values[property_name]</code></pre>
+</details>
+<div class="desc"><p>Get the value of a property from the properties dictionary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The property value.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.get_room_list"><code class="name flex">
+<span>def <span class="ident">get_room_list</span></span>(<span>self) ‑> List[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_room_list(self) -&gt; List[str]:
+    &#34;&#34;&#34;Gets the list of rooms known by the device&#34;&#34;&#34;
+    return self._get_device_room_list()[&#39;rooms&#39;]</code></pre>
+</details>
+<div class="desc"><p>Gets the list of rooms known by the device</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.set_operating_mode"><code class="name flex">
+<span>def <span class="ident">set_operating_mode</span></span>(<span>self,<br>mode: <a title="sharkiq.sharkiq.OperatingModes" href="#sharkiq.sharkiq.OperatingModes">OperatingModes</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_operating_mode(self, mode: OperatingModes):
+    &#34;&#34;&#34;
+    Set the operating mode. This is just a convenience wrapper around `set_property_value`.
+    
+    Args:
+        mode: The operating mode.
+    &#34;&#34;&#34;
+    self.set_property_value(Properties.OPERATING_MODE, mode)</code></pre>
+</details>
+<div class="desc"><p>Set the operating mode. This is just a convenience wrapper around <code>set_property_value</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>mode</code></strong></dt>
+<dd>The operating mode.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.set_property_endpoint"><code class="name flex">
+<span>def <span class="ident">set_property_endpoint</span></span>(<span>self, property_name) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_property_endpoint(self, property_name) -&gt; str:
+    &#34;&#34;&#34;
+    Get the API endpoint for a given property.
+    
+    Args:
+        property_name: The property name.
+    
+    Returns:
+        The API endpoint.
+    &#34;&#34;&#34;
+    return f&#39;{EU_DEVICE_URL if self.europe else DEVICE_URL:s}/apiv1/dsns/{self._dsn:s}/properties/{property_name:s}/datapoints.json&#39;</code></pre>
+</details>
+<div class="desc"><p>Get the API endpoint for a given property.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The API endpoint.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.set_property_value"><code class="name flex">
+<span>def <span class="ident">set_property_value</span></span>(<span>self, property_name: str | enum.Enum, value: str | int | enum.Enum)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_property_value(self, property_name: PropertyName, value: PropertyValue):
+    &#34;&#34;&#34;
+    Update a property.
+
+    Args:
+        property_name: The property name.
+        value: The property value.
+    &#34;&#34;&#34;
+    if isinstance(property_name, enum.Enum):
+        property_name = property_name.value
+    if isinstance(value, enum.Enum):
+        value = value.value
+    if self.properties_full.get(property_name, {}).get(&#39;read_only&#39;):
+        raise SharkIqReadOnlyPropertyError(f&#39;{property_name} is read only&#39;)
+
+    end_point = self.set_property_endpoint(f&#39;SET_{property_name}&#39;)
+    data = {&#39;datapoint&#39;: {&#39;value&#39;: value}}
+    resp = self.ayla_api.request(&#39;post&#39;, end_point, json=data)
+    self.properties_full[property_name].update(resp.json())</code></pre>
+</details>
+<div class="desc"><p>Update a property.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_name</code></strong></dt>
+<dd>The property name.</dd>
+<dt><strong><code>value</code></strong></dt>
+<dd>The property value.</dd>
+</dl></div>
+</dd>
+<dt id="sharkiq.sharkiq.SharkIqVacuum.update"><code class="name flex">
+<span>def <span class="ident">update</span></span>(<span>self, property_list: Iterable[str] | None = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update(self, property_list: Optional[Iterable[str]] = None):
+    &#34;&#34;&#34;
+    Update the known device state.
+
+    Args:
+        property_list: The list of properties to update.
+    &#34;&#34;&#34;
+    full_update = property_list is None
+    if full_update:
+        params = None
+    else:
+        params = {&#39;names[]&#39;: property_list}
+
+    resp = self.ayla_api.request(&#39;get&#39;, self.update_url, params=params)
+    properties = resp.json()
+    self._do_update(full_update, properties)</code></pre>
+</details>
+<div class="desc"><p>Update the known device state.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>property_list</code></strong></dt>
+<dd>The list of properties to update.</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+<dt id="sharkiq.sharkiq.SharkPropertiesView"><code class="flex name class">
+<span>class <span class="ident">SharkPropertiesView</span></span>
+<span>(</span><span>shark: <a title="sharkiq.sharkiq.SharkIqVacuum" href="#sharkiq.sharkiq.SharkIqVacuum">SharkIqVacuum</a>)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SharkPropertiesView(abc.Mapping):
+    &#34;&#34;&#34;Convenience API for shark iq properties&#34;&#34;&#34;
+
+    @staticmethod
+    def _cast_value(value, value_type):
+        &#34;&#34;&#34;
+        Cast property value to the appropriate type.
+
+        Args:
+            value: The value to cast.
+            value_type: The type to cast to.
+
+        Returns:
+            The cast value.
+        &#34;&#34;&#34;
+        if value is None:
+            return None
+        type_map = {
+            &#39;boolean&#39;: bool,
+            &#39;decimal&#39;: float,
+            &#39;integer&#39;: int,
+            &#39;string&#39;: str,
+        }
+        return type_map.get(value_type, lambda x: x)(value)
+
+    def __init__(self, shark: SharkIqVacuum):
+        &#34;&#34;&#34;
+        Initialize the shark properties view.
+        
+        Args:
+            shark: The shark iq vacuum.
+        &#34;&#34;&#34;
+        self._shark = shark
+
+    def __getitem__(self, key):
+        &#34;&#34;&#34;
+        Get a property value.
+
+        Args:
+            key: The property name.
+
+        Returns:
+            The property value.
+        &#34;&#34;&#34;
+        value = self._shark.properties_full[key].get(&#39;value&#39;)
+        value_type = self._shark.properties_full[key].get(&#39;base_type&#39;)
+        try:
+            return self._cast_value(value, value_type)
+        except (TypeError, ValueError) as exc:
+            # If we failed to convert the type, just return the raw value
+            _LOGGER.warning(&#39;Error converting property type (value: %r, type: %r)&#39;, value, value_type, exc_info=exc)
+            return value
+
+    def __iter__(self):
+        &#34;&#34;&#34;Iterate over the properties.&#34;&#34;&#34;
+        for k in self._shark.properties_full.keys():
+            yield k
+
+    def __len__(self) -&gt; int:
+        &#34;&#34;&#34;Return the number of properties.&#34;&#34;&#34;
+        return self._shark.properties_full.__len__()
+
+    def __str__(self) -&gt; str:
+        &#34;&#34;&#34;Return a string representation of the properties.&#34;&#34;&#34;
+        return pformat(dict(self))</code></pre>
+</details>
+<div class="desc"><p>Convenience API for shark iq properties</p>
+<p>Initialize the shark properties view.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>shark</code></strong></dt>
+<dd>The shark iq vacuum.</dd>
+</dl></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>collections.abc.Mapping</li>
+<li>collections.abc.Collection</li>
+<li>collections.abc.Sized</li>
+<li>collections.abc.Iterable</li>
+<li>collections.abc.Container</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="sharkiq" href="index.html">sharkiq</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="sharkiq.sharkiq.OperatingModes" href="#sharkiq.sharkiq.OperatingModes">OperatingModes</a></code></h4>
+<ul class="">
+<li><code><a title="sharkiq.sharkiq.OperatingModes.PAUSE" href="#sharkiq.sharkiq.OperatingModes.PAUSE">PAUSE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.OperatingModes.RETURN" href="#sharkiq.sharkiq.OperatingModes.RETURN">RETURN</a></code></li>
+<li><code><a title="sharkiq.sharkiq.OperatingModes.START" href="#sharkiq.sharkiq.OperatingModes.START">START</a></code></li>
+<li><code><a title="sharkiq.sharkiq.OperatingModes.STOP" href="#sharkiq.sharkiq.OperatingModes.STOP">STOP</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="sharkiq.sharkiq.PowerModes" href="#sharkiq.sharkiq.PowerModes">PowerModes</a></code></h4>
+<ul class="">
+<li><code><a title="sharkiq.sharkiq.PowerModes.ECO" href="#sharkiq.sharkiq.PowerModes.ECO">ECO</a></code></li>
+<li><code><a title="sharkiq.sharkiq.PowerModes.MAX" href="#sharkiq.sharkiq.PowerModes.MAX">MAX</a></code></li>
+<li><code><a title="sharkiq.sharkiq.PowerModes.NORMAL" href="#sharkiq.sharkiq.PowerModes.NORMAL">NORMAL</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="sharkiq.sharkiq.Properties" href="#sharkiq.sharkiq.Properties">Properties</a></code></h4>
+<ul class="">
+<li><code><a title="sharkiq.sharkiq.Properties.AREAS_TO_CLEAN" href="#sharkiq.sharkiq.Properties.AREAS_TO_CLEAN">AREAS_TO_CLEAN</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.BATTERY_CAPACITY" href="#sharkiq.sharkiq.Properties.BATTERY_CAPACITY">BATTERY_CAPACITY</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.CHARGING_STATUS" href="#sharkiq.sharkiq.Properties.CHARGING_STATUS">CHARGING_STATUS</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.CLEANING_STATISTICS" href="#sharkiq.sharkiq.Properties.CLEANING_STATISTICS">CLEANING_STATISTICS</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.CLEAN_COMPLETE" href="#sharkiq.sharkiq.Properties.CLEAN_COMPLETE">CLEAN_COMPLETE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.DOCKED_STATUS" href="#sharkiq.sharkiq.Properties.DOCKED_STATUS">DOCKED_STATUS</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.ERROR_CODE" href="#sharkiq.sharkiq.Properties.ERROR_CODE">ERROR_CODE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.EVACUATING" href="#sharkiq.sharkiq.Properties.EVACUATING">EVACUATING</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.FIND_DEVICE" href="#sharkiq.sharkiq.Properties.FIND_DEVICE">FIND_DEVICE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.LOW_LIGHT_MISSION" href="#sharkiq.sharkiq.Properties.LOW_LIGHT_MISSION">LOW_LIGHT_MISSION</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.NAV_MODULE_FW_VERSION" href="#sharkiq.sharkiq.Properties.NAV_MODULE_FW_VERSION">NAV_MODULE_FW_VERSION</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.OPERATING_MODE" href="#sharkiq.sharkiq.Properties.OPERATING_MODE">OPERATING_MODE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.POWER_MODE" href="#sharkiq.sharkiq.Properties.POWER_MODE">POWER_MODE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.RECHARGE_RESUME" href="#sharkiq.sharkiq.Properties.RECHARGE_RESUME">RECHARGE_RESUME</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.RECHARGING_TO_RESUME" href="#sharkiq.sharkiq.Properties.RECHARGING_TO_RESUME">RECHARGING_TO_RESUME</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.ROBOT_FIRMWARE_VERSION" href="#sharkiq.sharkiq.Properties.ROBOT_FIRMWARE_VERSION">ROBOT_FIRMWARE_VERSION</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.ROBOT_ROOM_LIST" href="#sharkiq.sharkiq.Properties.ROBOT_ROOM_LIST">ROBOT_ROOM_LIST</a></code></li>
+<li><code><a title="sharkiq.sharkiq.Properties.RSSI" href="#sharkiq.sharkiq.Properties.RSSI">RSSI</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="sharkiq.sharkiq.SharkIqVacuum" href="#sharkiq.sharkiq.SharkIqVacuum">SharkIqVacuum</a></code></h4>
+<ul class="">
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_clean_rooms" href="#sharkiq.sharkiq.SharkIqVacuum.async_clean_rooms">async_clean_rooms</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_find_device" href="#sharkiq.sharkiq.SharkIqVacuum.async_find_device">async_find_device</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_get_file_property" href="#sharkiq.sharkiq.SharkIqVacuum.async_get_file_property">async_get_file_property</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_get_file_property_url" href="#sharkiq.sharkiq.SharkIqVacuum.async_get_file_property_url">async_get_file_property_url</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_get_metadata" href="#sharkiq.sharkiq.SharkIqVacuum.async_get_metadata">async_get_metadata</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_set_operating_mode" href="#sharkiq.sharkiq.SharkIqVacuum.async_set_operating_mode">async_set_operating_mode</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_set_property_value" href="#sharkiq.sharkiq.SharkIqVacuum.async_set_property_value">async_set_property_value</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.async_update" href="#sharkiq.sharkiq.SharkIqVacuum.async_update">async_update</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.clean_rooms" href="#sharkiq.sharkiq.SharkIqVacuum.clean_rooms">clean_rooms</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.error_code" href="#sharkiq.sharkiq.SharkIqVacuum.error_code">error_code</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.error_text" href="#sharkiq.sharkiq.SharkIqVacuum.error_text">error_text</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.find_device" href="#sharkiq.sharkiq.SharkIqVacuum.find_device">find_device</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.get_file_property" href="#sharkiq.sharkiq.SharkIqVacuum.get_file_property">get_file_property</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.get_file_property_url" href="#sharkiq.sharkiq.SharkIqVacuum.get_file_property_url">get_file_property_url</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.get_metadata" href="#sharkiq.sharkiq.SharkIqVacuum.get_metadata">get_metadata</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.get_property_value" href="#sharkiq.sharkiq.SharkIqVacuum.get_property_value">get_property_value</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.get_room_list" href="#sharkiq.sharkiq.SharkIqVacuum.get_room_list">get_room_list</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.metadata_endpoint" href="#sharkiq.sharkiq.SharkIqVacuum.metadata_endpoint">metadata_endpoint</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.name" href="#sharkiq.sharkiq.SharkIqVacuum.name">name</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.oem_model_number" href="#sharkiq.sharkiq.SharkIqVacuum.oem_model_number">oem_model_number</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.serial_number" href="#sharkiq.sharkiq.SharkIqVacuum.serial_number">serial_number</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.set_operating_mode" href="#sharkiq.sharkiq.SharkIqVacuum.set_operating_mode">set_operating_mode</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.set_property_endpoint" href="#sharkiq.sharkiq.SharkIqVacuum.set_property_endpoint">set_property_endpoint</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.set_property_value" href="#sharkiq.sharkiq.SharkIqVacuum.set_property_value">set_property_value</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.update" href="#sharkiq.sharkiq.SharkIqVacuum.update">update</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.update_url" href="#sharkiq.sharkiq.SharkIqVacuum.update_url">update_url</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.vac_model_number" href="#sharkiq.sharkiq.SharkIqVacuum.vac_model_number">vac_model_number</a></code></li>
+<li><code><a title="sharkiq.sharkiq.SharkIqVacuum.vac_serial_number" href="#sharkiq.sharkiq.SharkIqVacuum.vac_serial_number">vac_serial_number</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="sharkiq.sharkiq.SharkPropertiesView" href="#sharkiq.sharkiq.SharkPropertiesView">SharkPropertiesView</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
