@@ -28,7 +28,7 @@ def generateURL(is_eu: bool, state: str, challenge: str):
         redirect_uri = AUTH0_EU_REDIRECT_URI
         client = AUTH0_EU_CLIENT
     else:
-        url = AUTH0_DOMAIN
+        url = AUTH0_DOMAIN + '/authorize'
         client_id = AUTH0_CLIENT_ID
         redirect_uri = AUTH0_REDIRECT_URI
         client = AUTH0_CLIENT
