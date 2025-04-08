@@ -40,7 +40,7 @@ def generateURL(is_eu: bool, state: str, challenge: str):
     + '&code_challenge=' + urlEncode(challenge)
     + '&code_challenge_method=S256'
     + '&ui_locales=en'
-    + '&auth0Client=' + client)
+    + '&auth0Client=' + urlEncode(client))
 
 def generateRandomString(length):
     characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
