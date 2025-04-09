@@ -1,7 +1,7 @@
 import aiohttp
 import pytest
 from sharkiq.ayla_api import get_ayla_api, AylaApi
-from sharkiq.const import SHARK_APP_ID, SHARK_APP_SECRET
+from sharkiq.const import SHARK_APP_ID, SHARK_APP_SECRET, AUTH0_CLIENT_ID
 from sharkiq.exc import (
     SharkIqAuthError,
     SharkIqAuthExpiringError,
@@ -29,7 +29,7 @@ def test_get_ayla_api():
 class TestAylaApi:
     def test_init__required_vals(self):
         api = AylaApi(
-            "myusername@mysite.com", "mypassword", "app_id_123", "appsecret_123"
+            "myusername@mysite.com", "mypassword", "app_id_123", "client_id_123", "appsecret_123"
         )
 
         assert api._email == "myusername@mysite.com"
@@ -40,6 +40,7 @@ class TestAylaApi:
         assert api._is_authed == False
         assert api._app_id == "app_id_123"
         assert api._app_secret == "appsecret_123"
+        assert api._auth0_client_id == "client_id_123"
         assert api.websession is None
 
     @pytest.mark.asyncio
@@ -54,27 +55,28 @@ class TestAylaApi:
         assert dummy_api.websession is session
 
     def test_property__login_data(self, dummy_api):
-        assert dummy_api._login_data == {
-            "user": {
-                "email": "myusername@mysite.com",
-                "password": "mypassword",
-                "application": {
-                    "app_id": SHARK_APP_ID,
-                    "app_secret": SHARK_APP_SECRET,
-                },
-            }
+        assert dummy_api._login_data["app_id"] == SHARK_APP_ID
+        assert dummy_api._login_data["app_secret"] == SHARK_APP_SECRET
+
+    def test_auth0__login_data(self, dummy_api):
+        assert dummy_api._auth0_login_data == {
+            "grant_type":"password",
+            "client_id": AUTH0_CLIENT_ID,
+            "username": "myusername@mysite.com",
+            "password": "mypassword",
+            "scope": "openid profile email offline_access"
         }
 
     def test_set_credentials__404_response(self, dummy_api):
         with pytest.raises(SharkIqAuthError) as e:
-            dummy_api._set_credentials(404, {"error": {"message": "Not found"}})
+            dummy_api._set_credentials(404, {"errors": "Not found"})
         assert (
             e.value.args[0] == "Not found (Confirm app_id and app_secret are correct)"
         )
 
     def test_set_credentials__401_response(self, dummy_api):
         with pytest.raises(SharkIqAuthError) as e:
-            dummy_api._set_credentials(401, {"error": {"message": "Unauthorized"}})
+            dummy_api._set_credentials(401, {"errors": "Unauthorized"})
         assert e.value.args[0] == "Unauthorized"
 
     def test_set_credentials__valid_response(self, dummy_api):
