@@ -153,8 +153,10 @@ class AylaApi:
             status_code: The status code of the login response.
             login_result: The result of the login response.
         """
-        if status_code == 401:
-            raise SharkIqAuthError(login_result["error_description"] + " (Confirm client_id is correct or you may be IP banned)")
+        if status_code == 401 and login_result["error"] == "requires_verification":
+            raise SharkIqAuthError(login_result["error_description"] + " (Try logging in with the SharkClean app, then try again)")
+        elif status_code == 401:
+            raise SharkIqAuthError(login_result["error_description"] + " (Confirm client_id is correct)")
         elif status_code == 400 or status_code == 403:
             raise SharkIqAuthError(login_result["error_description"])
         
