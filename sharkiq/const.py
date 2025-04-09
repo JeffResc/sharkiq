@@ -1,11 +1,14 @@
 """Various constants"""
 
+AUTH0_URL = "https://login.sharkninja.com"
+AUTH0_CLIENT_ID = "wsguxrqm77mq4LtrTrwg8ZJUxmSrexGi"
 DEVICE_URL = "https://ads-field-39a9391a.aylanetworks.com"
 LOGIN_URL = "https://user-field-39a9391a.aylanetworks.com"
-SHARK_APP_ID = "Shark-Android-field-id"
-SHARK_APP_SECRET = "Shark-Android-field-Wv43MbdXRM297HUHotqe6lU1n-w"
+SHARK_APP_ID = "ios_shark_prod-3A-id"
+SHARK_APP_SECRET = "ios_shark_prod-74tFWGNg34LQCmR0m45SsThqrqs"
+EU_AUTH0_URL = "https://logineu.sharkninja.com"
+EU_AUTH0_CLIENT_ID = "rKDx9O18dBrY3eoJMTkRiBZHDvd9Mx1I"
 EU_DEVICE_URL = "https://ads-eu.aylanetworks.com"
 EU_LOGIN_URL = "https://user-field-eu.aylanetworks.com"
 EU_SHARK_APP_ID = "Shark-Android-EUField-Fw-id"
 EU_SHARK_APP_SECRET = "Shark-Android-EUField-s-zTykblGJujGcSSTaJaeE4PESI"
-
