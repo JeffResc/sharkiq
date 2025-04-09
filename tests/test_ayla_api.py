@@ -67,6 +67,26 @@ class TestAylaApi:
             "scope": "openid profile email offline_access"
         }
 
+    def test_set_id_token__401_requires_verification_response(self, dummy_api):
+        with pytest.raises(SharkIqAuthError) as e:
+            dummy_api._set_id_token(401, {"error": "requires_verification", "error_description": "description"})
+        assert e.value.args[0] == "description (Try logging in with the SharkClean app, then try again)"
+
+    def test_set_id_token__401_response(self, dummy_api):
+        with pytest.raises(SharkIqAuthError) as e:
+            dummy_api._set_id_token(401, {"error": "generic", "error_description": "generic"})
+        assert e.value.args[0] == "generic (Confirm client_id is correct)"
+
+    def test_set_id_token__400_response(self, dummy_api):
+        with pytest.raises(SharkIqAuthError) as e:
+            dummy_api._set_id_token(400, {"error": "generic", "error_description": "generic"})
+        assert e.value.args[0] == "generic"
+
+    def test_set_id_token__403_response(self, dummy_api):
+        with pytest.raises(SharkIqAuthError) as e:
+            dummy_api._set_id_token(403, {"error": "generic", "error_description": "generic"})
+        assert e.value.args[0] == "generic"
+        
     def test_set_credentials__404_response(self, dummy_api):
         with pytest.raises(SharkIqAuthError) as e:
             dummy_api._set_credentials(404, {"errors": "Not found"})
