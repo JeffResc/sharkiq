@@ -18,7 +18,7 @@ pip install sharkiq
 Examples can be found in the [examples directory](examples/).
 
 ## Documentation
-You can view the latest docuemntation [here](https://jeffresc.github.io/sharkiq/).
+You can view the latest documentation [here](https://jeffresc.github.io/sharkiq/).
 
 ## TODOs:
  * Add support for mapping
