@@ -16,10 +16,14 @@ from .const import (
     LOGIN_URL,
     SHARK_APP_ID,
     SHARK_APP_SECRET,
+    AUTH0_URL,
+    AUTH0_CLIENT_ID,
     EU_DEVICE_URL,
     EU_LOGIN_URL,
     EU_SHARK_APP_ID,
-    EU_SHARK_APP_SECRET
+    EU_SHARK_APP_SECRET,
+    EU_AUTH0_URL,
+    EU_AUTH0_CLIENT_ID
 )
 from .exc import SharkIqAuthError, SharkIqAuthExpiringError, SharkIqNotAuthedError
 from .sharkiq import SharkIqVacuum
@@ -41,9 +45,9 @@ def get_ayla_api(username: str, password: str, websession: Optional[aiohttp.Clie
         An AylaApi object.
     """
     if europe:
-        return AylaApi(username, password, EU_SHARK_APP_ID, EU_SHARK_APP_SECRET, websession=websession, europe=europe)
+        return AylaApi(username, password, EU_SHARK_APP_ID, EU_AUTH0_CLIENT_ID, EU_SHARK_APP_SECRET, websession=websession, europe=europe)
     else:
-        return AylaApi(username, password, SHARK_APP_ID, SHARK_APP_SECRET, websession=websession)
+        return AylaApi(username, password, SHARK_APP_ID, AUTH0_CLIENT_ID, SHARK_APP_SECRET, websession=websession)
 
 
 class AylaApi:
@@ -54,6 +58,7 @@ class AylaApi:
             email: str,
             password: str,
             app_id: str,
+            auth0_client_id: str,
             app_secret: str,
             websession: Optional[aiohttp.ClientSession] = None,
             europe: bool = False):
@@ -70,11 +75,13 @@ class AylaApi:
         """
         self._email = email
         self._password = password
+        self._auth0_id_token = None  # type: Optional[str]
         self._access_token = None  # type: Optional[str]
         self._refresh_token = None  # type: Optional[str]
         self._auth_expiration = None  # type: Optional[datetime]
         self._is_authed = False  # type: bool
         self._app_id = app_id
+        self._auth0_client_id = auth0_client_id
         self._app_secret = app_secret
         self.websession = websession
         self.europe = europe
@@ -99,11 +106,25 @@ class AylaApi:
             A dict containing the login data.
         """
         return {
-            "user": {
-                "email": self._email,
-                "password": self._password,
-                "application": {"app_id": self._app_id, "app_secret": self._app_secret},
-            }
+            "app_id": self._app_id,
+            "app_secret": self._app_secret,
+            "token": self._auth0_id_token
+        }
+    
+    @property
+    def _auth0_login_data(self) -> Dict[str, Dict]:
+        """
+        Prettily formatted data for the Auth0 login flow.
+        
+        Returns:
+            A dict containing the login data.
+        """
+        return {
+            "grant_type": "password",
+            "client_id": self._auth0_client_id,
+            "username": self._email,
+            "password": self._password,
+            "scope": "openid profile email offline_access"
         }
 
     def _set_credentials(self, status_code: int, login_result: Dict):
@@ -115,21 +136,46 @@ class AylaApi:
             login_result: The result of the login response.
         """
         if status_code == 404:
-            raise SharkIqAuthError(login_result["error"]["message"] + " (Confirm app_id and app_secret are correct)")
+            raise SharkIqAuthError(login_result["errors"] + " (Confirm app_id and app_secret are correct)")
         elif status_code == 401:
-            raise SharkIqAuthError(login_result["error"]["message"])
+            raise SharkIqAuthError(login_result["errors"])
 
         self._access_token = login_result["access_token"]
         self._refresh_token = login_result["refresh_token"]
         self._auth_expiration = datetime.now() + timedelta(seconds=login_result["expires_in"])
         self._is_authed = True  # TODO: Any non 200 status code should cause this to be false
 
+    def _set_id_token(self, status_code: int, login_result: Dict):
+        """
+        Update the ID token.
+
+        Args:
+            status_code: The status code of the login response.
+            login_result: The result of the login response.
+        """
+        if status_code == 401 and login_result["error"] == "requires_verification":
+            raise SharkIqAuthError(login_result["error_description"] + " (Try logging in with the SharkClean app, then try again)")
+        elif status_code == 401:
+            raise SharkIqAuthError(login_result["error_description"] + " (Confirm client_id is correct)")
+        elif status_code == 400 or status_code == 403:
+            raise SharkIqAuthError(login_result["error_description"])
+        
+        self._auth0_id_token = login_result["id_token"]
+
     def sign_in(self):
         """
         Authenticate to Ayla API synchronously.
         """
+        auth0_login_data = self._auth0_login_data
+        headers = {
+            "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
+        }
+
+        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=auth0_login_data, headers=headers)
+        self._set_id_token(auth0_resp.status_code, auth0_resp.json())
+
         login_data = self._login_data
-        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_in.json", json=login_data)
+        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data)
         self._set_credentials(resp.status_code, resp.json())
 
     def refresh_auth(self):
@@ -142,12 +188,25 @@ class AylaApi:
 
     async def async_sign_in(self):
         """
-        Authenticate to Ayla API synchronously.
+        Authenticate to Ayla API asynchronously.
         """
         session = await self.ensure_session()
+
+        auth0_login_data = self._auth0_login_data
+        headers = {
+            "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
+        }
+        auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
+        async with session.post(auth0_url, json=auth0_login_data, headers=headers) as auth0_resp:
+            auth0_resp_json = await auth0_resp.json()
+            self._set_id_token(auth0_resp.status, auth0_resp_json)
+
         login_data = self._login_data
-        async with session.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_in.json", json=login_data) as resp:
-            self._set_credentials(resp.status, await resp.json())
+        login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
+        async with session.post(login_url, json=login_data) as login_resp:
+            login_resp_json = await login_resp.json()
+            self._set_credentials(login_resp.status, login_resp_json)
+
 
     async def async_refresh_auth(self):
         """
