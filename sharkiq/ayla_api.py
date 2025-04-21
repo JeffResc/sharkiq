@@ -31,13 +31,14 @@ from .sharkiq import SharkIqVacuum
 _session = None
 
 
-def get_ayla_api(username: str, password: str, websession: Optional[aiohttp.ClientSession] = None, europe: bool = False):
+def get_ayla_api(username: str, password: str, refresh_token: str = None, websession: Optional[aiohttp.ClientSession] = None, europe: bool = False):
     """
     Get an AylaApi object.
 
     Args:
         username: The email address of the user.
         password: The password of the user.
+        refresh_token: The refresh token for the Auth0 account.
         websession: A websession to use for the API.  If None, a new session will be created.
         europe: If True, use the EU login URL and app ID/secret.
 
@@ -45,9 +46,9 @@ def get_ayla_api(username: str, password: str, websession: Optional[aiohttp.Clie
         An AylaApi object.
     """
     if europe:
-        return AylaApi(username, password, EU_SHARK_APP_ID, EU_AUTH0_CLIENT_ID, EU_SHARK_APP_SECRET, websession=websession, europe=europe)
+        return AylaApi(username, password, EU_SHARK_APP_ID, EU_AUTH0_CLIENT_ID, EU_SHARK_APP_SECRET, auth0_refresh_token=refresh_token, websession=websession, europe=europe)
     else:
-        return AylaApi(username, password, SHARK_APP_ID, AUTH0_CLIENT_ID, SHARK_APP_SECRET, websession=websession)
+        return AylaApi(username, password, SHARK_APP_ID, AUTH0_CLIENT_ID, SHARK_APP_SECRET, auth0_refresh_token=refresh_token, websession=websession)
 
 
 class AylaApi:
@@ -60,6 +61,7 @@ class AylaApi:
             app_id: str,
             auth0_client_id: str,
             app_secret: str,
+            auth0_refresh_token: str = None,
             websession: Optional[aiohttp.ClientSession] = None,
             europe: bool = False):
         """
@@ -70,11 +72,13 @@ class AylaApi:
             password: The password of the user.
             app_id: The app ID of the Ayla app.
             app_secret: The app secret of the Ayla app.
+            auth0_refresh_token: The refresh token for the Auth0 account.
             websession: A websession to use for the API.  If None, a new session will be created.
             europe: If True, use the EU login URL and app ID/secret.
         """
         self._email = email
         self._password = password
+        self.auth0_refresh_token = auth0_refresh_token
         self._auth0_id_token = None  # type: Optional[str]
         self._access_token = None  # type: Optional[str]
         self._refresh_token = None  # type: Optional[str]
@@ -127,6 +131,22 @@ class AylaApi:
             "scope": "openid profile email offline_access"
         }
 
+    @property
+    def _auth0_refresh_data(self) -> Dict[str, Dict]:
+        """
+        Prettily formatted data for the Auth0 refresh flow.
+        
+        Returns:
+            A dict containing the refresh data.
+        """
+        if self.auth0_refresh_token is None:
+            return None
+        return {
+            "grant_type": "refresh_token",
+            "client_id": self._auth0_client_id,
+            "refresh_token": self.auth0_refresh_token
+        }
+
     def _set_credentials(self, status_code: int, login_result: Dict):
         """
         Update the internal credentials store.
@@ -160,13 +180,14 @@ class AylaApi:
         elif status_code == 400 or status_code == 403:
             raise SharkIqAuthError(login_result["error_description"])
         
+        self.auth0_refresh_token = login_result["refresh_token"]
         self._auth0_id_token = login_result["id_token"]
 
     def sign_in(self):
         """
         Authenticate to Ayla API synchronously.
         """
-        auth0_login_data = self._auth0_login_data
+        auth0_login_data = self._auth0_refresh_data or self._auth0_login_data
         headers = {
             "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
         }
@@ -192,7 +213,7 @@ class AylaApi:
         """
         session = await self.ensure_session()
 
-        auth0_login_data = self._auth0_login_data
+        auth0_login_data = self._auth0_refresh_data or self._auth0_login_data
         headers = {
             "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
         }
