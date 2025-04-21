@@ -13,10 +13,11 @@ from datetime import datetime, timedelta
 
 
 def test_get_ayla_api():
-    api = get_ayla_api("myusername@mysite.com", "mypassword")
+    api = get_ayla_api("myusername@mysite.com", "mypassword", "refresh_token_123")
 
     assert api._email == "myusername@mysite.com"
     assert api._password == "mypassword"
+    assert api.auth0_refresh_token == "refresh_token_123"
     assert api._access_token is None
     assert api._refresh_token is None
     assert api._auth_expiration is None
@@ -41,6 +42,7 @@ class TestAylaApi:
         assert api._app_id == "app_id_123"
         assert api._app_secret == "appsecret_123"
         assert api._auth0_client_id == "client_id_123"
+        assert api.auth0_refresh_token is None
         assert api.websession is None
 
     @pytest.mark.asyncio
@@ -65,6 +67,11 @@ class TestAylaApi:
             "username": "myusername@mysite.com",
             "password": "mypassword",
             "scope": "openid profile email offline_access"
+        }
+        assert dummy_api._auth0_refresh_login_data == {
+            "grant_type": "refresh_token",
+            "client_id": AUTH0_CLIENT_ID,
+            "refresh_token": "refresh_token_123",
         }
 
     def test_set_id_token__401_requires_verification_response(self, dummy_api):
