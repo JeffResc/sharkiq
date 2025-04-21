@@ -68,7 +68,7 @@ class TestAylaApi:
             "password": "mypassword",
             "scope": "openid profile email offline_access"
         }
-        assert dummy_api._auth0_refresh_login_data == {
+        assert dummy_api._auth0_refresh_data == {
             "grant_type": "refresh_token",
             "client_id": AUTH0_CLIENT_ID,
             "refresh_token": "refresh_token_123",
