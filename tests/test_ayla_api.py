@@ -68,6 +68,11 @@ class TestAylaApi:
             "password": "mypassword",
             "scope": "openid profile email offline_access"
         }
+
+    def test_auth0__refresh_data(self, dummy_api):
+        assert dummy_api.auth0_refresh_token == None
+        assert dummy_api._auth0_refresh_data == None
+        dummy_api.auth0_refresh_token = "refresh_token_123"
         assert dummy_api._auth0_refresh_data == {
             "grant_type": "refresh_token",
             "client_id": AUTH0_CLIENT_ID,
