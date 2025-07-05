@@ -66,11 +66,18 @@ class OperatingModes(enum.IntEnum):
         PAUSE: Paused.
         START: Started.
         RETURN: Returning.
+        EXPLORE: Explore and learn map.
+        MOP: Mopping.
+        VACCUM_AND_MOP: Both Vacuum and Mop.
+
     &#34;&#34;&#34;
     STOP = 0
     PAUSE = 1
     START = 2
-    RETURN = 3</code></pre>
+    RETURN = 3
+    EXPLORE = 4
+    MOP = 7
+    VACCUM_AND_MOP = 8</code></pre>
 </details>
 <div class="desc"><p>Vacuum operation modes.</p>
 <h2 id="attributes">Attributes</h2>
@@ -83,6 +90,12 @@ class OperatingModes(enum.IntEnum):
 <dd>Started.</dd>
 <dt><strong><code>RETURN</code></strong></dt>
 <dd>Returning.</dd>
+<dt><strong><code>EXPLORE</code></strong></dt>
+<dd>Explore and learn map.</dd>
+<dt><strong><code>MOP</code></strong></dt>
+<dd>Mopping.</dd>
+<dt><strong><code>VACCUM_AND_MOP</code></strong></dt>
+<dd>Both Vacuum and Mop.</dd>
 </dl></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -93,6 +106,14 @@ class OperatingModes(enum.IntEnum):
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="sharkiq.sharkiq.OperatingModes.EXPLORE"><code class="name">var <span class="ident">EXPLORE</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.OperatingModes.MOP"><code class="name">var <span class="ident">MOP</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
 <dt id="sharkiq.sharkiq.OperatingModes.PAUSE"><code class="name">var <span class="ident">PAUSE</span></code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
@@ -106,6 +127,10 @@ class OperatingModes(enum.IntEnum):
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
 <dt id="sharkiq.sharkiq.OperatingModes.STOP"><code class="name">var <span class="ident">STOP</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="sharkiq.sharkiq.OperatingModes.VACCUM_AND_MOP"><code class="name">var <span class="ident">VACCUM_AND_MOP</span></code></dt>
 <dd>
 <div class="desc"><p>The type of the None singleton.</p></div>
 </dd>
@@ -1666,11 +1691,14 @@ def vac_serial_number(self) -&gt; Optional[str]:
 <ul>
 <li>
 <h4><code><a title="sharkiq.sharkiq.OperatingModes" href="#sharkiq.sharkiq.OperatingModes">OperatingModes</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="sharkiq.sharkiq.OperatingModes.EXPLORE" href="#sharkiq.sharkiq.OperatingModes.EXPLORE">EXPLORE</a></code></li>
+<li><code><a title="sharkiq.sharkiq.OperatingModes.MOP" href="#sharkiq.sharkiq.OperatingModes.MOP">MOP</a></code></li>
 <li><code><a title="sharkiq.sharkiq.OperatingModes.PAUSE" href="#sharkiq.sharkiq.OperatingModes.PAUSE">PAUSE</a></code></li>
 <li><code><a title="sharkiq.sharkiq.OperatingModes.RETURN" href="#sharkiq.sharkiq.OperatingModes.RETURN">RETURN</a></code></li>
 <li><code><a title="sharkiq.sharkiq.OperatingModes.START" href="#sharkiq.sharkiq.OperatingModes.START">START</a></code></li>
 <li><code><a title="sharkiq.sharkiq.OperatingModes.STOP" href="#sharkiq.sharkiq.OperatingModes.STOP">STOP</a></code></li>
+<li><code><a title="sharkiq.sharkiq.OperatingModes.VACCUM_AND_MOP" href="#sharkiq.sharkiq.OperatingModes.VACCUM_AND_MOP">VACCUM_AND_MOP</a></code></li>
 </ul>
 </li>
 <li>
