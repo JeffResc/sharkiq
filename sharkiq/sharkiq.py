@@ -64,12 +64,18 @@ class OperatingModes(enum.IntEnum):
         PAUSE: Paused.
         START: Started.
         RETURN: Returning.
+        EXPLORE: Explore and learn map.
+        MOP: Mopping.
+        VACCUM_AND_MOP: Both Vacuum and Mop.
+
     """
     STOP = 0
     PAUSE = 1
     START = 2
     RETURN = 3
-
+    EXPLORE = 4
+    MOP = 7
+    VACCUM_AND_MOP = 8
 
 @enum.unique
 class Properties(enum.Enum):
