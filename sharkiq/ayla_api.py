@@ -9,15 +9,19 @@ found at:
 
 import aiohttp
 import requests
+import json
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from .const import (
     DEVICE_URL,
     LOGIN_URL,
+    BROWSER_USERAGENT,
     SHARK_APP_ID,
     SHARK_APP_SECRET,
+    SHARK_APP_USERAGENT,
     AUTH0_URL,
     AUTH0_CLIENT_ID,
+    AUTH0_SCOPES,
     EU_DEVICE_URL,
     EU_LOGIN_URL,
     EU_SHARK_APP_ID,
@@ -124,7 +128,7 @@ class AylaApi:
             "client_id": self._auth0_client_id,
             "username": self._email,
             "password": self._password,
-            "scope": "openid profile email offline_access"
+            "scope": AUTH0_SCOPES
         }
 
     def _set_credentials(self, status_code: int, login_result: Dict):
@@ -143,7 +147,7 @@ class AylaApi:
         self._access_token = login_result["access_token"]
         self._refresh_token = login_result["refresh_token"]
         self._auth_expiration = datetime.now() + timedelta(seconds=login_result["expires_in"])
-        self._is_authed = True  # TODO: Any non 200 status code should cause this to be false
+        self._is_authed = (status_code < 400)
 
     def _set_id_token(self, status_code: int, login_result: Dict):
         """
@@ -167,15 +171,18 @@ class AylaApi:
         Authenticate to Ayla API synchronously.
         """
         auth0_login_data = self._auth0_login_data
-        headers = {
-            "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
+        auth0_headers = {
+            "User-Agent": BROWSER_USERAGENT
+        }
+        api_headers = {
+            "User-Agent": SHARK_APP_USERAGENT
         }
 
-        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=auth0_login_data, headers=headers)
+        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=auth0_login_data, headers=auth0_headers)
         self._set_id_token(auth0_resp.status_code, auth0_resp.json())
 
         login_data = self._login_data
-        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data)
+        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data, headers=api_headers)
         self._set_credentials(resp.status_code, resp.json())
 
     def refresh_auth(self):
@@ -193,18 +200,26 @@ class AylaApi:
         session = await self.ensure_session()
 
         auth0_login_data = self._auth0_login_data
-        headers = {
-            "User-Agent": "SharkClean/29562 CFNetwork/3826.400.120 Darwin/24.3.0"
+        auth0_headers = {
+            "User-Agent": BROWSER_USERAGENT
         }
+        api_headers = {
+            "User-Agent": SHARK_APP_USERAGENT
+        }
+
         auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
-        async with session.post(auth0_url, json=auth0_login_data, headers=headers) as auth0_resp:
+        async with session.post(auth0_url, json=auth0_login_data, headers=auth0_headers) as auth0_resp:
             auth0_resp_json = await auth0_resp.json()
+            print("Auth status code " + str(auth0_resp.status))
+            print("Auth status code " + json.dumps(auth0_resp_json))
             self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
-        async with session.post(login_url, json=login_data) as login_resp:
+        async with session.post(login_url, json=login_data, headers=api_headers) as login_resp:
             login_resp_json = await login_resp.json()
+            print("Login status code " + str(login_resp.status))
+            print("Login status code " + json.dumps(login_resp_json))
             self._set_credentials(login_resp.status, login_resp_json)
 
 
