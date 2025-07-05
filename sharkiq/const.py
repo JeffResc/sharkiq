@@ -2,6 +2,7 @@
 
 AUTH0_URL = "https://login.sharkninja.com"
 AUTH0_CLIENT_ID = "wsguxrqm77mq4LtrTrwg8ZJUxmSrexGi"
+AUTH0_SCOPES = "openid profile email offline_access"
 DEVICE_URL = "https://ads-field-39a9391a.aylanetworks.com"
 LOGIN_URL = "https://user-field-39a9391a.aylanetworks.com"
 SHARK_APP_ID = "ios_shark_prod-3A-id"

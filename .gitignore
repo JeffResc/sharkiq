@@ -138,3 +138,6 @@ driver.py
 
 # Documentation
 html/
+
+# Local env test file
+examples/test.py
