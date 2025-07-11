@@ -210,16 +210,12 @@ class AylaApi:
         auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
         async with session.post(auth0_url, json=auth0_login_data, headers=auth0_headers) as auth0_resp:
             auth0_resp_json = await auth0_resp.json()
-            print("Auth status code " + str(auth0_resp.status))
-            print("Auth status code " + json.dumps(auth0_resp_json))
             self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
         async with session.post(login_url, json=login_data, headers=api_headers) as login_resp:
             login_resp_json = await login_resp.json()
-            print("Login status code " + str(login_resp.status))
-            print("Login status code " + json.dumps(login_resp_json))
             self._set_credentials(login_resp.status, login_resp_json)
 
 
