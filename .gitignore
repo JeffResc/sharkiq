@@ -140,4 +140,4 @@ driver.py
 html/
 
 # Local env test file
-examples/test.py
+examples/test.*
