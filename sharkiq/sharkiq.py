@@ -621,13 +621,20 @@ class SharkIqVacuum:
     def _get_device_room_list(self):
         """Gets the list of known rooms from the device, including the map identifier"""
         room_list = self.get_property_value(Properties.ROBOT_ROOM_LIST)
-        split = room_list.split(':')
-        return {
-            # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
-            # onboard map in the robot
-            'identifier': split[0],
-            'rooms': split[1:],
-        }
+        if ":" in room_list: 
+            room_arr = room_list.split(':')
+            return {
+                # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
+                # onboard map in the robot
+                'identifier': room_arr[0],
+                'rooms': room_arr[1:],
+            }
+        else:
+            return {
+                # No room support - retain response format
+                'identifier': 'none',
+                'rooms': [],
+            }
 
     def get_room_list(self) -> List[str]:
         """Gets the list of rooms known by the device"""
