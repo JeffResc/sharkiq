@@ -621,7 +621,10 @@ class SharkIqVacuum:
     def _get_device_room_list(self):
         """Gets the list of known rooms from the device, including the map identifier"""
         room_list = self.get_property_value(Properties.ROBOT_ROOM_LIST)
-        split = room_list.split(':')
+        if room_list:
+            split = room_list.split(':')
+        else:
+            split = ['rooms']
         return {
             # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
             # onboard map in the robot
