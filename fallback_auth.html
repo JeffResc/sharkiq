@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>sharkiq API documentation</title>
-<meta name="description" content="Unofficial SDK for Shark IQ robot vacuums, designed primarily to support an integration for Home Assistant.">
+<title>sharkiq.fallback_auth API documentation</title>
+<meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
@@ -33,41 +33,152 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>sharkiq</code></h1>
+<h1 class="title">Module <code>sharkiq.fallback_auth</code></h1>
 </header>
 <section id="section-intro">
-<p>Unofficial SDK for Shark IQ robot vacuums, designed primarily to support an integration for Home Assistant.</p>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="sharkiq.ayla_api" href="ayla_api.html">sharkiq.ayla_api</a></code></dt>
+<dt id="sharkiq.fallback_auth.FallbackAuth"><code class="flex name class">
+<span>class <span class="ident">FallbackAuth</span></span>
+</code></dt>
 <dd>
-<div class="desc"><p>Simple implementation of the Ayla networks API …</p></div>
-</dd>
-<dt><code class="name"><a title="sharkiq.const" href="const.html">sharkiq.const</a></code></dt>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FallbackAuth:
+  def GenerateFallbackAuthURL(europe: bool):
+    state = FallbackAuth.generateRandomString(43)
+    verification = FallbackAuth.generateRandomString(43)
+    challenge = FallbackAuth.generateChallengeB64Hash(verification)
+    base_url = EU_AUTH0_URL if europe == True else AUTH0_URL
+
+    url = (base_url + &#34;/authorize?os=ios&amp;response_type=code&amp;mobile_shark_app_version=rn1.01&#34;
+    + &#39;&amp;client_id=&#39; + FallbackAuth.urlEncode(AUTH0_CLIENT_ID)
+    + &#39;&amp;state=&#39; + FallbackAuth.urlEncode(state)
+    + &#39;&amp;scope=&#39; + FallbackAuth.urlEncode(AUTH0_SCOPES)
+    + &#39;&amp;redirect_uri=&#39; + FallbackAuth.urlEncode(AUTH0_REDIRECT_URI)
+    + &#39;&amp;code_challenge=&#39; + FallbackAuth.urlEncode(challenge)
+    + &#39;&amp;screen_hint=signin&#39;
+    + &#39;&amp;code_challenge_method=S256&#39;
+    + &#39;&amp;ui_locales=en&#39;
+    + &#39;&amp;auth0Client=&#39; + AUTH0_CLIENT)
+    
+    return url
+
+  def generateRandomString(length):
+    characters = &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&#39;
+    result = &#39;&#39;
+    for _ in range(length):
+      randomIndex = math.floor(random.random() * len(characters))
+      result += characters[randomIndex]
+
+    return result
+
+  def generateChallengeB64Hash(verification_code):
+    verification_encoded = codecs.encode(verification_code, &#39;utf-8&#39;)
+    verification_sha256 = hashlib.sha256(verification_encoded)
+    challenge_b64 = base64.b64encode(verification_sha256.digest()).decode()
+    challenge_b64_clean = challenge_b64.replace(&#34;+&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;_&#34;).replace(&#34;=&#34;, &#34;&#34;).replace(&#34;$&#34;, &#34;&#34;)
+
+    return challenge_b64_clean
+
+  def urlEncode(s):
+    return urllib.parse.quote_plus(s)</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Methods</h3>
+<dl>
+<dt id="sharkiq.fallback_auth.FallbackAuth.GenerateFallbackAuthURL"><code class="name flex">
+<span>def <span class="ident">GenerateFallbackAuthURL</span></span>(<span>europe: bool)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Various constants</p></div>
-</dd>
-<dt><code class="name"><a title="sharkiq.exc" href="exc.html">sharkiq.exc</a></code></dt>
-<dd>
-<div class="desc"><p>Exceptions.</p></div>
-</dd>
-<dt><code class="name"><a title="sharkiq.fallback_auth" href="fallback_auth.html">sharkiq.fallback_auth</a></code></dt>
-<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def GenerateFallbackAuthURL(europe: bool):
+  state = FallbackAuth.generateRandomString(43)
+  verification = FallbackAuth.generateRandomString(43)
+  challenge = FallbackAuth.generateChallengeB64Hash(verification)
+  base_url = EU_AUTH0_URL if europe == True else AUTH0_URL
+
+  url = (base_url + &#34;/authorize?os=ios&amp;response_type=code&amp;mobile_shark_app_version=rn1.01&#34;
+  + &#39;&amp;client_id=&#39; + FallbackAuth.urlEncode(AUTH0_CLIENT_ID)
+  + &#39;&amp;state=&#39; + FallbackAuth.urlEncode(state)
+  + &#39;&amp;scope=&#39; + FallbackAuth.urlEncode(AUTH0_SCOPES)
+  + &#39;&amp;redirect_uri=&#39; + FallbackAuth.urlEncode(AUTH0_REDIRECT_URI)
+  + &#39;&amp;code_challenge=&#39; + FallbackAuth.urlEncode(challenge)
+  + &#39;&amp;screen_hint=signin&#39;
+  + &#39;&amp;code_challenge_method=S256&#39;
+  + &#39;&amp;ui_locales=en&#39;
+  + &#39;&amp;auth0Client=&#39; + AUTH0_CLIENT)
+  
+  return url</code></pre>
+</details>
 <div class="desc"></div>
 </dd>
-<dt><code class="name"><a title="sharkiq.sharkiq" href="sharkiq.html">sharkiq.sharkiq</a></code></dt>
+<dt id="sharkiq.fallback_auth.FallbackAuth.generateChallengeB64Hash"><code class="name flex">
+<span>def <span class="ident">generateChallengeB64Hash</span></span>(<span>verification_code)</span>
+</code></dt>
 <dd>
-<div class="desc"><p>Shark IQ Wrapper.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generateChallengeB64Hash(verification_code):
+  verification_encoded = codecs.encode(verification_code, &#39;utf-8&#39;)
+  verification_sha256 = hashlib.sha256(verification_encoded)
+  challenge_b64 = base64.b64encode(verification_sha256.digest()).decode()
+  challenge_b64_clean = challenge_b64.replace(&#34;+&#34;, &#34;-&#34;).replace(&#34;/&#34;, &#34;_&#34;).replace(&#34;=&#34;, &#34;&#34;).replace(&#34;$&#34;, &#34;&#34;)
+
+  return challenge_b64_clean</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="sharkiq.fallback_auth.FallbackAuth.generateRandomString"><code class="name flex">
+<span>def <span class="ident">generateRandomString</span></span>(<span>length)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generateRandomString(length):
+  characters = &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&#39;
+  result = &#39;&#39;
+  for _ in range(length):
+    randomIndex = math.floor(random.random() * len(characters))
+    result += characters[randomIndex]
+
+  return result</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="sharkiq.fallback_auth.FallbackAuth.urlEncode"><code class="name flex">
+<span>def <span class="ident">urlEncode</span></span>(<span>s)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def urlEncode(s):
+  return urllib.parse.quote_plus(s)</code></pre>
+</details>
+<div class="desc"></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -75,13 +186,22 @@ el.replaceWith(d);
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="sharkiq.ayla_api" href="ayla_api.html">sharkiq.ayla_api</a></code></li>
-<li><code><a title="sharkiq.const" href="const.html">sharkiq.const</a></code></li>
-<li><code><a title="sharkiq.exc" href="exc.html">sharkiq.exc</a></code></li>
-<li><code><a title="sharkiq.fallback_auth" href="fallback_auth.html">sharkiq.fallback_auth</a></code></li>
-<li><code><a title="sharkiq.sharkiq" href="sharkiq.html">sharkiq.sharkiq</a></code></li>
+<li><code><a title="sharkiq" href="index.html">sharkiq</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="sharkiq.fallback_auth.FallbackAuth" href="#sharkiq.fallback_auth.FallbackAuth">FallbackAuth</a></code></h4>
+<ul class="">
+<li><code><a title="sharkiq.fallback_auth.FallbackAuth.GenerateFallbackAuthURL" href="#sharkiq.fallback_auth.FallbackAuth.GenerateFallbackAuthURL">GenerateFallbackAuthURL</a></code></li>
+<li><code><a title="sharkiq.fallback_auth.FallbackAuth.generateChallengeB64Hash" href="#sharkiq.fallback_auth.FallbackAuth.generateChallengeB64Hash">generateChallengeB64Hash</a></code></li>
+<li><code><a title="sharkiq.fallback_auth.FallbackAuth.generateRandomString" href="#sharkiq.fallback_auth.FallbackAuth.generateRandomString">generateRandomString</a></code></li>
+<li><code><a title="sharkiq.fallback_auth.FallbackAuth.urlEncode" href="#sharkiq.fallback_auth.FallbackAuth.urlEncode">urlEncode</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

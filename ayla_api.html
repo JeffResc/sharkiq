@@ -204,6 +204,13 @@ If None, a new session will be created.</dd>
             &#34;Sec-Gpc&#34;: &#34;1&#34;,
             &#34;User-Agent&#34;: BROWSER_USERAGENT
         }
+    
+    @property
+    def _ayla_login_headers(self) -&gt; Dict[str, Dict]:
+        return {
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+            &#34;User-Agent&#34;: BROWSER_USERAGENT
+        }
 
     def _set_credentials(self, status_code: int, login_result: Dict):
         &#34;&#34;&#34;
@@ -232,6 +239,7 @@ If None, a new session will be created.</dd>
             login_result: The result of the login response.
         &#34;&#34;&#34;
         if status_code == 401 and login_result[&#34;error&#34;] == &#34;requires_verification&#34;:
+
             raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34;. Auth request flagged for verification.&#34;)
         elif status_code == 401:
             raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34;. Confirm credentials are correct.&#34;)
@@ -240,55 +248,32 @@ If None, a new session will be created.</dd>
         
         self._auth0_id_token = login_result[&#34;id_token&#34;]
 
-    def sign_in(self):
+    async def async_set_cookie(self):
         &#34;&#34;&#34;
-        Authenticate to Ayla API synchronously.
+        Query Auth0 to set session cookies [required for Auth0 support]
         &#34;&#34;&#34;
-        auth0_login_data = {
-            &#34;grant_type&#34;: &#34;password&#34;,
-            &#34;client_id&#34;: self._auth0_client_id,
-            &#34;username&#34;: self._email,
-            &#34;password&#34;: self._password,
-            &#34;scope&#34;: AUTH0_SCOPES
-        }
-        api_headers = {
-            &#34;User-Agent&#34;: SHARK_APP_USERAGENT
-        }
+        initial_url = self.gen_fallback_url()
+        ayla_client = await self.ensure_session()
 
-        auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=self._auth0_login_headers)
-        self._set_id_token(auth0_resp.status_code, auth0_resp.json())
-
-        login_data = self._login_data
-        resp = requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in&#34;, json=login_data, headers=api_headers)
-        self._set_credentials(resp.status_code, resp.json())
-
-    def refresh_auth(self):
-        &#34;&#34;&#34;
-        Refresh the authentication synchronously.
-        &#34;&#34;&#34;
-        refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
-        resp = requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data)
-        self._set_credentials(resp.status_code, resp.json())
+        async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
+            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
 
     async def async_sign_in(self):
         &#34;&#34;&#34;
-        Authenticate to Ayla API asynchronously.
+        Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
         &#34;&#34;&#34;
-
         auth0_login_data = self._auth0_login_data
-        api_headers = {
-            &#34;User-Agent&#34;: SHARK_APP_USERAGENT
-        }
         ayla_client = await self.ensure_session()
 
         auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
         async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
             auth0_resp_json = await auth0_resp.json()
             self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
-        async with ayla_client.post(login_url, json=login_data, headers=api_headers) as login_resp:
+        async with ayla_client.post(login_url, json=login_data, headers=self._ayla_login_headers) as login_resp:
             login_resp_json = await login_resp.json()
             self._set_credentials(login_resp.status, login_resp_json)
 
@@ -299,7 +284,7 @@ If None, a new session will be created.</dd>
         &#34;&#34;&#34;
         refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
         ayla_client = await self.ensure_session()
-        async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
+        async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data, headers=self._ayla_login_headers) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     @property
@@ -321,13 +306,6 @@ If None, a new session will be created.</dd>
         self._refresh_token = None
         self._auth_expiration = None
 
-    def sign_out(self):
-        &#34;&#34;&#34;
-        Sign out and invalidate the access token.
-        &#34;&#34;&#34;
-        requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data)
-        self._clear_auth()
-
     async def async_sign_out(self):
         &#34;&#34;&#34;
         Sign out and invalidate the access token.
@@ -336,6 +314,9 @@ If None, a new session will be created.</dd>
         async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data) as _:
             pass
         self._clear_auth()
+
+    def gen_fallback_url(self):
+        return FallbackAuth.GenerateFallbackAuthURL(self.europe)
 
     @property
     def auth_expiration(self) -&gt; Optional[datetime]:
@@ -743,7 +724,7 @@ def token_expiring_soon(self) -&gt; bool:
     &#34;&#34;&#34;
     refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
     ayla_client = await self.ensure_session()
-    async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
+    async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data, headers=self._ayla_login_headers) as resp:
         self._set_credentials(resp.status, await resp.json())</code></pre>
 </details>
 <div class="desc"><p>Refresh the authentication synchronously.</p></div>
@@ -787,6 +768,26 @@ def token_expiring_soon(self) -&gt; bool:
 <h2 id="returns">Returns</h2>
 <p>The response from the request.</p></div>
 </dd>
+<dt id="sharkiq.ayla_api.AylaApi.async_set_cookie"><code class="name flex">
+<span>async def <span class="ident">async_set_cookie</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_set_cookie(self):
+    &#34;&#34;&#34;
+    Query Auth0 to set session cookies [required for Auth0 support]
+    &#34;&#34;&#34;
+    initial_url = self.gen_fallback_url()
+    ayla_client = await self.ensure_session()
+
+    async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
+        ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)</code></pre>
+</details>
+<div class="desc"><p>Query Auth0 to set session cookies [required for Auth0 support]</p></div>
+</dd>
 <dt id="sharkiq.ayla_api.AylaApi.async_sign_in"><code class="name flex">
 <span>async def <span class="ident">async_sign_in</span></span>(<span>self)</span>
 </code></dt>
@@ -797,27 +798,24 @@ def token_expiring_soon(self) -&gt; bool:
 </summary>
 <pre><code class="python">async def async_sign_in(self):
     &#34;&#34;&#34;
-    Authenticate to Ayla API asynchronously.
+    Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
     &#34;&#34;&#34;
-
     auth0_login_data = self._auth0_login_data
-    api_headers = {
-        &#34;User-Agent&#34;: SHARK_APP_USERAGENT
-    }
     ayla_client = await self.ensure_session()
 
     auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
     async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+        ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
         auth0_resp_json = await auth0_resp.json()
         self._set_id_token(auth0_resp.status, auth0_resp_json)
 
     login_data = self._login_data
     login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
-    async with ayla_client.post(login_url, json=login_data, headers=api_headers) as login_resp:
+    async with ayla_client.post(login_url, json=login_data, headers=self._ayla_login_headers) as login_resp:
         login_resp_json = await login_resp.json()
         self._set_credentials(login_resp.status, login_resp_json)</code></pre>
 </details>
-<div class="desc"><p>Authenticate to Ayla API asynchronously.</p></div>
+<div class="desc"><p>Authenticate to Ayla API asynchronously via Auth0 [requires cookies]</p></div>
 </dd>
 <dt id="sharkiq.ayla_api.AylaApi.async_sign_out"><code class="name flex">
 <span>async def <span class="ident">async_sign_out</span></span>(<span>self)</span>
@@ -900,6 +898,19 @@ def token_expiring_soon(self) -&gt; bool:
 <h2 id="returns">Returns</h2>
 <p>An aiohttp ClientSession.</p></div>
 </dd>
+<dt id="sharkiq.ayla_api.AylaApi.gen_fallback_url"><code class="name flex">
+<span>def <span class="ident">gen_fallback_url</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def gen_fallback_url(self):
+    return FallbackAuth.GenerateFallbackAuthURL(self.europe)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
 <dt id="sharkiq.ayla_api.AylaApi.get_devices"><code class="name flex">
 <span>def <span class="ident">get_devices</span></span>(<span>self, update: bool = True) ‑> List[<a title="sharkiq.sharkiq.SharkIqVacuum" href="sharkiq.html#sharkiq.sharkiq.SharkIqVacuum">SharkIqVacuum</a>]</span>
 </code></dt>
@@ -959,24 +970,6 @@ def token_expiring_soon(self) -&gt; bool:
 <h2 id="returns">Returns</h2>
 <p>A list of devices.</p></div>
 </dd>
-<dt id="sharkiq.ayla_api.AylaApi.refresh_auth"><code class="name flex">
-<span>def <span class="ident">refresh_auth</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def refresh_auth(self):
-    &#34;&#34;&#34;
-    Refresh the authentication synchronously.
-    &#34;&#34;&#34;
-    refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
-    resp = requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data)
-    self._set_credentials(resp.status_code, resp.json())</code></pre>
-</details>
-<div class="desc"><p>Refresh the authentication synchronously.</p></div>
-</dd>
 <dt id="sharkiq.ayla_api.AylaApi.request"><code class="name flex">
 <span>def <span class="ident">request</span></span>(<span>self, method: str, url: str, **kwargs) ‑> requests.models.Response</span>
 </code></dt>
@@ -1013,55 +1006,6 @@ def token_expiring_soon(self) -&gt; bool:
 <h2 id="returns">Returns</h2>
 <p>The response from the request.</p></div>
 </dd>
-<dt id="sharkiq.ayla_api.AylaApi.sign_in"><code class="name flex">
-<span>def <span class="ident">sign_in</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def sign_in(self):
-    &#34;&#34;&#34;
-    Authenticate to Ayla API synchronously.
-    &#34;&#34;&#34;
-    auth0_login_data = {
-        &#34;grant_type&#34;: &#34;password&#34;,
-        &#34;client_id&#34;: self._auth0_client_id,
-        &#34;username&#34;: self._email,
-        &#34;password&#34;: self._password,
-        &#34;scope&#34;: AUTH0_SCOPES
-    }
-    api_headers = {
-        &#34;User-Agent&#34;: SHARK_APP_USERAGENT
-    }
-
-    auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=self._auth0_login_headers)
-    self._set_id_token(auth0_resp.status_code, auth0_resp.json())
-
-    login_data = self._login_data
-    resp = requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in&#34;, json=login_data, headers=api_headers)
-    self._set_credentials(resp.status_code, resp.json())</code></pre>
-</details>
-<div class="desc"><p>Authenticate to Ayla API synchronously.</p></div>
-</dd>
-<dt id="sharkiq.ayla_api.AylaApi.sign_out"><code class="name flex">
-<span>def <span class="ident">sign_out</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def sign_out(self):
-    &#34;&#34;&#34;
-    Sign out and invalidate the access token.
-    &#34;&#34;&#34;
-    requests.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data)
-    self._clear_auth()</code></pre>
-</details>
-<div class="desc"><p>Sign out and invalidate the access token.</p></div>
-</dd>
 </dl>
 </dd>
 </dl>
@@ -1092,18 +1036,17 @@ def token_expiring_soon(self) -&gt; bool:
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_list_devices" href="#sharkiq.ayla_api.AylaApi.async_list_devices">async_list_devices</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_refresh_auth" href="#sharkiq.ayla_api.AylaApi.async_refresh_auth">async_refresh_auth</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_request" href="#sharkiq.ayla_api.AylaApi.async_request">async_request</a></code></li>
+<li><code><a title="sharkiq.ayla_api.AylaApi.async_set_cookie" href="#sharkiq.ayla_api.AylaApi.async_set_cookie">async_set_cookie</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_sign_in" href="#sharkiq.ayla_api.AylaApi.async_sign_in">async_sign_in</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_sign_out" href="#sharkiq.ayla_api.AylaApi.async_sign_out">async_sign_out</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.auth_expiration" href="#sharkiq.ayla_api.AylaApi.auth_expiration">auth_expiration</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.auth_header" href="#sharkiq.ayla_api.AylaApi.auth_header">auth_header</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.check_auth" href="#sharkiq.ayla_api.AylaApi.check_auth">check_auth</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.ensure_session" href="#sharkiq.ayla_api.AylaApi.ensure_session">ensure_session</a></code></li>
+<li><code><a title="sharkiq.ayla_api.AylaApi.gen_fallback_url" href="#sharkiq.ayla_api.AylaApi.gen_fallback_url">gen_fallback_url</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.get_devices" href="#sharkiq.ayla_api.AylaApi.get_devices">get_devices</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.list_devices" href="#sharkiq.ayla_api.AylaApi.list_devices">list_devices</a></code></li>
-<li><code><a title="sharkiq.ayla_api.AylaApi.refresh_auth" href="#sharkiq.ayla_api.AylaApi.refresh_auth">refresh_auth</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.request" href="#sharkiq.ayla_api.AylaApi.request">request</a></code></li>
-<li><code><a title="sharkiq.ayla_api.AylaApi.sign_in" href="#sharkiq.ayla_api.AylaApi.sign_in">sign_in</a></code></li>
-<li><code><a title="sharkiq.ayla_api.AylaApi.sign_out" href="#sharkiq.ayla_api.AylaApi.sign_out">sign_out</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.sign_out_data" href="#sharkiq.ayla_api.AylaApi.sign_out_data">sign_out_data</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.token_expired" href="#sharkiq.ayla_api.AylaApi.token_expired">token_expired</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.token_expiring_soon" href="#sharkiq.ayla_api.AylaApi.token_expiring_soon">token_expiring_soon</a></code></li>
