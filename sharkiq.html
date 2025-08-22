@@ -835,13 +835,20 @@ class Properties(enum.Enum):
     def _get_device_room_list(self):
         &#34;&#34;&#34;Gets the list of known rooms from the device, including the map identifier&#34;&#34;&#34;
         room_list = self.get_property_value(Properties.ROBOT_ROOM_LIST)
-        split = room_list.split(&#39;:&#39;)
-        return {
-            # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
-            # onboard map in the robot
-            &#39;identifier&#39;: split[0],
-            &#39;rooms&#39;: split[1:],
-        }
+        if &#34;:&#34; in room_list: 
+            room_arr = room_list.split(&#39;:&#39;)
+            return {
+                # The room list is preceded by an identifier, which I believe identifies the list of rooms with the
+                # onboard map in the robot
+                &#39;identifier&#39;: room_arr[0],
+                &#39;rooms&#39;: room_arr[1:],
+            }
+        else:
+            return {
+                # No room support - retain response format
+                &#39;identifier&#39;: &#39;none&#39;,
+                &#39;rooms&#39;: [],
+            }
 
     def get_room_list(self) -&gt; List[str]:
         &#34;&#34;&#34;Gets the list of rooms known by the device&#34;&#34;&#34;

@@ -182,6 +182,28 @@ If None, a new session will be created.</dd>
             &#34;password&#34;: self._password,
             &#34;scope&#34;: AUTH0_SCOPES
         }
+    
+    @property
+    def _auth0_login_headers(self) -&gt; Dict[str, Dict]:
+        return {
+            &#34;Accept&#34;: &#34;application/json, text/plain, */*&#34;,
+            &#34;Accept-Encoding&#34;: &#34;gzip, deflate, br, zstd&#34;,
+            &#34;Accept-Language&#34;: &#34;en-US,en;q=0.9&#34;,
+            &#34;Content-Type&#34;: &#34;application/json&#34;,
+            &#34;dnt&#34;: &#34;1&#34;,
+            &#34;Host&#34;: EU_AUTH0_HOST if self.europe else AUTH0_HOST,
+            &#34;Origin&#34;: EU_AUTH0_URL if self.europe else AUTH0_URL,
+            &#34;Priority&#34;: &#34;u=1, i&#34;,
+            &#34;Referrer&#34;: EU_AUTH0_URL if self.europe else AUTH0_URL + &#34;/&#34;,
+            &#34;Sec-Ch-Ua&#34;: &#39;&#34;Chrome&#34;;v=&#34;137&#34;, &#34;Chromium&#34;;v=&#34;137&#34;, &#34;Not A;Brand&#34;;v=&#34;24&#34;&#39;,
+            &#34;Sec-Ch-Ua-Mobile&#34;: &#34;?0&#34;,
+            &#34;Sec-Ch-Ua-Platform&#34;: &#39;&#34;macOS&#34;&#39;,
+            &#34;Sec-Fetch-Dest&#34;: &#34;empty&#34;,
+            &#34;Sec-Fetch-Mode&#34;: &#34;cors&#34;,
+            &#34;Sec-Fetch-Site&#34;: &#34;same-origin&#34;,
+            &#34;Sec-Gpc&#34;: &#34;1&#34;,
+            &#34;User-Agent&#34;: BROWSER_USERAGENT
+        }
 
     def _set_credentials(self, status_code: int, login_result: Dict):
         &#34;&#34;&#34;
@@ -210,9 +232,9 @@ If None, a new session will be created.</dd>
             login_result: The result of the login response.
         &#34;&#34;&#34;
         if status_code == 401 and login_result[&#34;error&#34;] == &#34;requires_verification&#34;:
-            raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34; (Try logging in with the SharkClean app, then try again)&#34;)
+            raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34;. Auth request flagged for verification.&#34;)
         elif status_code == 401:
-            raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34; (Confirm client_id is correct)&#34;)
+            raise SharkIqAuthError(login_result[&#34;error_description&#34;] + &#34;. Confirm credentials are correct.&#34;)
         elif status_code == 400 or status_code == 403:
             raise SharkIqAuthError(login_result[&#34;error_description&#34;])
         
@@ -222,15 +244,18 @@ If None, a new session will be created.</dd>
         &#34;&#34;&#34;
         Authenticate to Ayla API synchronously.
         &#34;&#34;&#34;
-        auth0_login_data = self._auth0_login_data
-        auth0_headers = {
-            &#34;User-Agent&#34;: BROWSER_USERAGENT
+        auth0_login_data = {
+            &#34;grant_type&#34;: &#34;password&#34;,
+            &#34;client_id&#34;: self._auth0_client_id,
+            &#34;username&#34;: self._email,
+            &#34;password&#34;: self._password,
+            &#34;scope&#34;: AUTH0_SCOPES
         }
         api_headers = {
             &#34;User-Agent&#34;: SHARK_APP_USERAGENT
         }
 
-        auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=auth0_headers)
+        auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=self._auth0_login_headers)
         self._set_id_token(auth0_resp.status_code, auth0_resp.json())
 
         login_data = self._login_data
@@ -249,29 +274,22 @@ If None, a new session will be created.</dd>
         &#34;&#34;&#34;
         Authenticate to Ayla API asynchronously.
         &#34;&#34;&#34;
-        session = await self.ensure_session()
 
         auth0_login_data = self._auth0_login_data
-        auth0_headers = {
-            &#34;User-Agent&#34;: BROWSER_USERAGENT
-        }
         api_headers = {
             &#34;User-Agent&#34;: SHARK_APP_USERAGENT
         }
+        ayla_client = await self.ensure_session()
 
         auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
-        async with session.post(auth0_url, json=auth0_login_data, headers=auth0_headers) as auth0_resp:
+        async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
             auth0_resp_json = await auth0_resp.json()
-            print(&#34;Auth status code &#34; + str(auth0_resp.status))
-            print(&#34;Auth status code &#34; + json.dumps(auth0_resp_json))
             self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
-        async with session.post(login_url, json=login_data, headers=api_headers) as login_resp:
+        async with ayla_client.post(login_url, json=login_data, headers=api_headers) as login_resp:
             login_resp_json = await login_resp.json()
-            print(&#34;Login status code &#34; + str(login_resp.status))
-            print(&#34;Login status code &#34; + json.dumps(login_resp_json))
             self._set_credentials(login_resp.status, login_resp_json)
 
 
@@ -279,9 +297,9 @@ If None, a new session will be created.</dd>
         &#34;&#34;&#34;
         Refresh the authentication synchronously.
         &#34;&#34;&#34;
-        session = await self.ensure_session()
         refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
-        async with session.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
+        ayla_client = await self.ensure_session()
+        async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     @property
@@ -314,8 +332,8 @@ If None, a new session will be created.</dd>
         &#34;&#34;&#34;
         Sign out and invalidate the access token.
         &#34;&#34;&#34;
-        session = await self.ensure_session()
-        async with session.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data) as _:
+        ayla_client = await self.ensure_session()
+        async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data) as _:
             pass
         self._clear_auth()
 
@@ -433,9 +451,11 @@ If None, a new session will be created.</dd>
         Returns:
             The response from the request.
         &#34;&#34;&#34;
-        session = await self.ensure_session()
+        ayla_client = await self.ensure_session()
         headers = self._get_headers(kwargs)
-        return session.request(http_method, url, headers=headers, **kwargs)
+        result = ayla_client.request(http_method, url, headers=headers, **kwargs)
+
+        return result
 
     def list_devices(self) -&gt; List[Dict]:
         &#34;&#34;&#34;
@@ -495,7 +515,12 @@ If None, a new session will be created.</dd>
             for device in devices:
                 await device.async_get_metadata()
                 await device.async_update()
-        return devices</code></pre>
+        return devices
+    
+    async def async_close_session(self):
+        shared_session = self.ensure_session()
+        if shared_session is not None:
+            shared_session.close()</code></pre>
 </details>
 <div class="desc"><p>Simple Ayla Networks API wrapper.</p>
 <p>Initialize the AylaApi object.</p>
@@ -630,6 +655,21 @@ def token_expiring_soon(self) -&gt; bool:
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="sharkiq.ayla_api.AylaApi.async_close_session"><code class="name flex">
+<span>async def <span class="ident">async_close_session</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">async def async_close_session(self):
+    shared_session = self.ensure_session()
+    if shared_session is not None:
+        shared_session.close()</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
 <dt id="sharkiq.ayla_api.AylaApi.async_get_devices"><code class="name flex">
 <span>async def <span class="ident">async_get_devices</span></span>(<span>self, update: bool = True) ‑> List[<a title="sharkiq.sharkiq.SharkIqVacuum" href="sharkiq.html#sharkiq.sharkiq.SharkIqVacuum">SharkIqVacuum</a>]</span>
 </code></dt>
@@ -701,9 +741,9 @@ def token_expiring_soon(self) -&gt; bool:
     &#34;&#34;&#34;
     Refresh the authentication synchronously.
     &#34;&#34;&#34;
-    session = await self.ensure_session()
     refresh_data = {&#34;user&#34;: {&#34;refresh_token&#34;: self._refresh_token}}
-    async with session.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
+    ayla_client = await self.ensure_session()
+    async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json&#34;, json=refresh_data) as resp:
         self._set_credentials(resp.status, await resp.json())</code></pre>
 </details>
 <div class="desc"><p>Refresh the authentication synchronously.</p></div>
@@ -728,9 +768,11 @@ def token_expiring_soon(self) -&gt; bool:
     Returns:
         The response from the request.
     &#34;&#34;&#34;
-    session = await self.ensure_session()
+    ayla_client = await self.ensure_session()
     headers = self._get_headers(kwargs)
-    return session.request(http_method, url, headers=headers, **kwargs)</code></pre>
+    result = ayla_client.request(http_method, url, headers=headers, **kwargs)
+
+    return result</code></pre>
 </details>
 <div class="desc"><p>Make a request to the Ayla API.</p>
 <h2 id="args">Args</h2>
@@ -757,29 +799,22 @@ def token_expiring_soon(self) -&gt; bool:
     &#34;&#34;&#34;
     Authenticate to Ayla API asynchronously.
     &#34;&#34;&#34;
-    session = await self.ensure_session()
 
     auth0_login_data = self._auth0_login_data
-    auth0_headers = {
-        &#34;User-Agent&#34;: BROWSER_USERAGENT
-    }
     api_headers = {
         &#34;User-Agent&#34;: SHARK_APP_USERAGENT
     }
+    ayla_client = await self.ensure_session()
 
     auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
-    async with session.post(auth0_url, json=auth0_login_data, headers=auth0_headers) as auth0_resp:
+    async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
         auth0_resp_json = await auth0_resp.json()
-        print(&#34;Auth status code &#34; + str(auth0_resp.status))
-        print(&#34;Auth status code &#34; + json.dumps(auth0_resp_json))
         self._set_id_token(auth0_resp.status, auth0_resp_json)
 
     login_data = self._login_data
     login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
-    async with session.post(login_url, json=login_data, headers=api_headers) as login_resp:
+    async with ayla_client.post(login_url, json=login_data, headers=api_headers) as login_resp:
         login_resp_json = await login_resp.json()
-        print(&#34;Login status code &#34; + str(login_resp.status))
-        print(&#34;Login status code &#34; + json.dumps(login_resp_json))
         self._set_credentials(login_resp.status, login_resp_json)</code></pre>
 </details>
 <div class="desc"><p>Authenticate to Ayla API asynchronously.</p></div>
@@ -796,8 +831,8 @@ def token_expiring_soon(self) -&gt; bool:
     &#34;&#34;&#34;
     Sign out and invalidate the access token.
     &#34;&#34;&#34;
-    session = await self.ensure_session()
-    async with session.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data) as _:
+    ayla_client = await self.ensure_session()
+    async with ayla_client.post(f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json&#34;, json=self.sign_out_data) as _:
         pass
     self._clear_auth()</code></pre>
 </details>
@@ -990,15 +1025,18 @@ def token_expiring_soon(self) -&gt; bool:
     &#34;&#34;&#34;
     Authenticate to Ayla API synchronously.
     &#34;&#34;&#34;
-    auth0_login_data = self._auth0_login_data
-    auth0_headers = {
-        &#34;User-Agent&#34;: BROWSER_USERAGENT
+    auth0_login_data = {
+        &#34;grant_type&#34;: &#34;password&#34;,
+        &#34;client_id&#34;: self._auth0_client_id,
+        &#34;username&#34;: self._email,
+        &#34;password&#34;: self._password,
+        &#34;scope&#34;: AUTH0_SCOPES
     }
     api_headers = {
         &#34;User-Agent&#34;: SHARK_APP_USERAGENT
     }
 
-    auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=auth0_headers)
+    auth0_resp = requests.post(f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token&#34;, json=auth0_login_data, headers=self._auth0_login_headers)
     self._set_id_token(auth0_resp.status_code, auth0_resp.json())
 
     login_data = self._login_data
@@ -1049,6 +1087,7 @@ def token_expiring_soon(self) -&gt; bool:
 <li>
 <h4><code><a title="sharkiq.ayla_api.AylaApi" href="#sharkiq.ayla_api.AylaApi">AylaApi</a></code></h4>
 <ul class="two-column">
+<li><code><a title="sharkiq.ayla_api.AylaApi.async_close_session" href="#sharkiq.ayla_api.AylaApi.async_close_session">async_close_session</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_get_devices" href="#sharkiq.ayla_api.AylaApi.async_get_devices">async_get_devices</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_list_devices" href="#sharkiq.ayla_api.AylaApi.async_list_devices">async_list_devices</a></code></li>
 <li><code><a title="sharkiq.ayla_api.AylaApi.async_refresh_auth" href="#sharkiq.ayla_api.AylaApi.async_refresh_auth">async_refresh_auth</a></code></li>
