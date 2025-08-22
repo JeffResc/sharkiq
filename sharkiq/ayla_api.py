@@ -32,6 +32,7 @@ from .const import (
 )
 from .exc import SharkIqAuthError, SharkIqAuthExpiringError, SharkIqNotAuthedError
 from .sharkiq import SharkIqVacuum
+from .fallback_auth import FallbackAuth
 
 _session = None
 
@@ -181,6 +182,7 @@ class AylaApi:
             login_result: The result of the login response.
         """
         if status_code == 401 and login_result["error"] == "requires_verification":
+
             raise SharkIqAuthError(login_result["error_description"] + ". Auth request flagged for verification.")
         elif status_code == 401:
             raise SharkIqAuthError(login_result["error_description"] + ". Confirm credentials are correct.")
@@ -219,15 +221,23 @@ class AylaApi:
         resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data)
         self._set_credentials(resp.status_code, resp.json())
 
+    async def async_set_cookie(self):
+        """
+        Query API to get cookie
+        """
+        initial_url = self.gen_fallback_url()
+        ayla_client = await self.ensure_session()
+        auth0_login_data = self._auth0_login_data
+
+        async with ayla_client.post(initial_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+            cookie_resp_json = await auth0_resp.json()
+            self._set_id_token(auth0_resp.status, auth0_resp_json)
+
     async def async_sign_in(self):
         """
         Authenticate to Ayla API asynchronously.
         """
-
         auth0_login_data = self._auth0_login_data
-        api_headers = {
-            "User-Agent": SHARK_APP_USERAGENT
-        }
         ayla_client = await self.ensure_session()
 
         auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
@@ -237,7 +247,7 @@ class AylaApi:
 
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
-        async with ayla_client.post(login_url, json=login_data, headers=api_headers) as login_resp:
+        async with ayla_client.post(login_url, json=login_data, headers=self._auth0_login_headers) as login_resp:
             login_resp_json = await login_resp.json()
             self._set_credentials(login_resp.status, login_resp_json)
 
@@ -285,6 +295,9 @@ class AylaApi:
         async with ayla_client.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data) as _:
             pass
         self._clear_auth()
+
+    def gen_fallback_url(self):
+        return FallbackAuth.GenerateFallbackAuthURL(self.europe)
 
     @property
     def auth_expiration(self) -> Optional[datetime]:
