@@ -198,30 +198,9 @@ class AylaApi:
         
         self._auth0_id_token = login_result["id_token"]
 
-    def sign_in(self):
-        """
-        Authenticate to Ayla API synchronously.
-        """
-
-        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=self._auth0_login_data, headers=self._auth0_login_headers)
-        self._set_id_token(auth0_resp.status_code, auth0_resp.json())
-
-        login_data = self._login_data
-        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data, headers=self._auth0_login_headers)
-
-        self._set_credentials(resp.status_code, resp.json())
-
-    def refresh_auth(self):
-        """
-        Refresh the authentication synchronously.
-        """
-        refresh_data = {"user": {"refresh_token": self._refresh_token}}
-        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data)
-        self._set_credentials(resp.status_code, resp.json())
-
     async def async_set_cookie(self):
         """
-        Query API to get cookie
+        Query Auth0 to set session cookies [required for Auth0 support]
         """
         initial_url = self.gen_fallback_url()
         ayla_client = await self.ensure_session()
@@ -231,13 +210,14 @@ class AylaApi:
 
     async def async_sign_in(self):
         """
-        Authenticate to Ayla API asynchronously.
+        Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
         """
         auth0_login_data = self._auth0_login_data
         ayla_client = await self.ensure_session()
 
         auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
         async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
             auth0_resp_json = await auth0_resp.json()
             self._set_id_token(auth0_resp.status, auth0_resp_json)
 
@@ -275,13 +255,6 @@ class AylaApi:
         self._access_token = None
         self._refresh_token = None
         self._auth_expiration = None
-
-    def sign_out(self):
-        """
-        Sign out and invalidate the access token.
-        """
-        requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/sign_out.json", json=self.sign_out_data)
-        self._clear_auth()
 
     async def async_sign_out(self):
         """
