@@ -154,6 +154,13 @@ class AylaApi:
             "Sec-Gpc": "1",
             "User-Agent": BROWSER_USERAGENT
         }
+    
+    @property
+    def _ayla_login_headers(self) -> Dict[str, Dict]:
+        return {
+            "Content-Type": "application/json",
+            "User-Agent": BROWSER_USERAGENT
+        }
 
     def _set_credentials(self, status_code: int, login_result: Dict):
         """
@@ -211,6 +218,7 @@ class AylaApi:
 
         login_data = self._login_data
         resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data, headers=api_headers)
+
         self._set_credentials(resp.status_code, resp.json())
 
     def refresh_auth(self):
@@ -227,11 +235,9 @@ class AylaApi:
         """
         initial_url = self.gen_fallback_url()
         ayla_client = await self.ensure_session()
-        auth0_login_data = self._auth0_login_data
 
-        async with ayla_client.post(initial_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
-            cookie_resp_json = await auth0_resp.json()
-            self._set_id_token(auth0_resp.status, auth0_resp_json)
+        async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
+            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
 
     async def async_sign_in(self):
         """
@@ -247,7 +253,8 @@ class AylaApi:
 
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
-        async with ayla_client.post(login_url, json=login_data, headers=self._auth0_login_headers) as login_resp:
+        async with ayla_client.post(login_url, json=login_data, headers=self._ayla_login_headers) as login_resp:
+            print(login_resp)
             login_resp_json = await login_resp.json()
             self._set_credentials(login_resp.status, login_resp_json)
 
@@ -258,7 +265,7 @@ class AylaApi:
         """
         refresh_data = {"user": {"refresh_token": self._refresh_token}}
         ayla_client = await self.ensure_session()
-        async with ayla_client.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data) as resp:
+        async with ayla_client.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/users/refresh_token.json", json=refresh_data, headers=self._ayla_login_headers) as resp:
             self._set_credentials(resp.status, await resp.json())
 
     @property
