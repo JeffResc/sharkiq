@@ -202,22 +202,12 @@ class AylaApi:
         """
         Authenticate to Ayla API synchronously.
         """
-        auth0_login_data = {
-            "grant_type": "password",
-            "client_id": self._auth0_client_id,
-            "username": self._email,
-            "password": self._password,
-            "scope": AUTH0_SCOPES
-        }
-        api_headers = {
-            "User-Agent": SHARK_APP_USERAGENT
-        }
 
-        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=auth0_login_data, headers=self._auth0_login_headers)
+        auth0_resp = requests.post(f"{EU_AUTH0_URL if self.europe else AUTH0_URL:s}/oauth/token", json=self._auth0_login_data, headers=self._auth0_login_headers)
         self._set_id_token(auth0_resp.status_code, auth0_resp.json())
 
         login_data = self._login_data
-        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data, headers=api_headers)
+        resp = requests.post(f"{EU_LOGIN_URL if self.europe else LOGIN_URL:s}/api/v1/token_sign_in", json=login_data, headers=self._auth0_login_headers)
 
         self._set_credentials(resp.status_code, resp.json())
 
@@ -254,7 +244,6 @@ class AylaApi:
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
         async with ayla_client.post(login_url, json=login_data, headers=self._ayla_login_headers) as login_resp:
-            print(login_resp)
             login_resp_json = await login_resp.json()
             self._set_credentials(login_resp.status, login_resp_json)
 
