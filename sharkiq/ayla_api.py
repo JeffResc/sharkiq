@@ -9,6 +9,7 @@ found at:
 
 import aiohttp
 import requests
+from auth0.authentication import GetToken
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from .const import (
@@ -17,7 +18,7 @@ from .const import (
     AUTH0_HOST,
     SHARK_APP_ID,
     SHARK_APP_SECRET,
-    SHARK_APP_USERAGENT,
+    AUTH0_CLIENT,
     AUTH0_URL,
     AUTH0_CLIENT_ID,
     AUTH0_SCOPES,
@@ -208,18 +209,28 @@ class AylaApi:
         async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
             ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
 
-    async def async_sign_in(self):
+    async def async_sign_in(self, use_auth0=False):
         """
         Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
         """
         auth0_login_data = self._auth0_login_data
         ayla_client = await self.ensure_session()
 
-        auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
-        async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
-            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
-            auth0_resp_json = await auth0_resp.json()
-            self._set_id_token(auth0_resp.status, auth0_resp_json)
+        if use_auth0:
+            auth_client = GetToken(AUTH0_HOST, AUTH0_CLIENT_ID)
+            auth_result = auth_client.login(
+                username=self._email,
+                password=self._password,
+                grant_type='password',
+                scope=AUTH0_SCOPES
+            )
+            self._auth0_id_token = auth_result["id_token"]
+        else:
+            auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
+            async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+                ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
+                auth0_resp_json = await auth0_resp.json()
+                self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f"{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in"
