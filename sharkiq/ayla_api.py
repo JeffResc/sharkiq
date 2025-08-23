@@ -210,7 +210,7 @@ class AylaApi:
         async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
             ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
 
-    async def async_sign_in(self, use_auth0=False):
+    async def async_sign_in(self, use_auth0=True):
         """
         Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
         """
