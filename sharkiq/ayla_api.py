@@ -10,6 +10,7 @@ found at:
 import aiohttp
 import requests
 from auth0.authentication import GetToken
+from auth0.asyncify import asyncify
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from .const import (
@@ -217,13 +218,16 @@ class AylaApi:
         ayla_client = await self.ensure_session()
 
         if use_auth0:
-            auth_client = GetToken(AUTH0_HOST, AUTH0_CLIENT_ID)
-            auth_result = auth_client.login(
+            AsyncGetToken = asyncify(GetToken)
+            get_token = AsyncGetToken(AUTH0_HOST, AUTH0_CLIENT_ID)
+
+            auth_result = await get_token.login_async(
                 username=self._email,
                 password=self._password,
                 grant_type='password',
                 scope=AUTH0_SCOPES
             )
+
             self._auth0_id_token = auth_result["id_token"]
         else:
             auth0_url = f"{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token"
