@@ -9,5 +9,6 @@ from .exc import (
     SharkIqReadOnlyPropertyError,
 )
 from .sharkiq import OperatingModes, PowerModes,  Properties, SharkIqVacuum
+from .const import BROWSER_USERAGENT
 
 __version__ = '1.2.0'
