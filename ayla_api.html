@@ -258,18 +258,31 @@ If None, a new session will be created.</dd>
         async with ayla_client.get(initial_url, allow_redirects=False, headers=self._auth0_login_headers) as auth0_resp:
             ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
 
-    async def async_sign_in(self):
+    async def async_sign_in(self, use_auth0=True):
         &#34;&#34;&#34;
         Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
         &#34;&#34;&#34;
         auth0_login_data = self._auth0_login_data
         ayla_client = await self.ensure_session()
 
-        auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
-        async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
-            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
-            auth0_resp_json = await auth0_resp.json()
-            self._set_id_token(auth0_resp.status, auth0_resp_json)
+        if use_auth0:
+            AsyncGetToken = asyncify(GetToken)
+            get_token = AsyncGetToken(AUTH0_HOST, AUTH0_CLIENT_ID)
+
+            auth_result = await get_token.login_async(
+                username=self._email,
+                password=self._password,
+                grant_type=&#39;password&#39;,
+                scope=AUTH0_SCOPES
+            )
+
+            self._auth0_id_token = auth_result[&#34;id_token&#34;]
+        else:
+            auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
+            async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+                ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
+                auth0_resp_json = await auth0_resp.json()
+                self._set_id_token(auth0_resp.status, auth0_resp_json)
 
         login_data = self._login_data
         login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
@@ -789,25 +802,38 @@ def token_expiring_soon(self) -&gt; bool:
 <div class="desc"><p>Query Auth0 to set session cookies [required for Auth0 support]</p></div>
 </dd>
 <dt id="sharkiq.ayla_api.AylaApi.async_sign_in"><code class="name flex">
-<span>async def <span class="ident">async_sign_in</span></span>(<span>self)</span>
+<span>async def <span class="ident">async_sign_in</span></span>(<span>self, use_auth0=True)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def async_sign_in(self):
+<pre><code class="python">async def async_sign_in(self, use_auth0=True):
     &#34;&#34;&#34;
     Authenticate to Ayla API asynchronously via Auth0 [requires cookies]
     &#34;&#34;&#34;
     auth0_login_data = self._auth0_login_data
     ayla_client = await self.ensure_session()
 
-    auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
-    async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
-        ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
-        auth0_resp_json = await auth0_resp.json()
-        self._set_id_token(auth0_resp.status, auth0_resp_json)
+    if use_auth0:
+        AsyncGetToken = asyncify(GetToken)
+        get_token = AsyncGetToken(AUTH0_HOST, AUTH0_CLIENT_ID)
+
+        auth_result = await get_token.login_async(
+            username=self._email,
+            password=self._password,
+            grant_type=&#39;password&#39;,
+            scope=AUTH0_SCOPES
+        )
+
+        self._auth0_id_token = auth_result[&#34;id_token&#34;]
+    else:
+        auth0_url = f&#34;{EU_AUTH0_URL if self.europe else AUTH0_URL}/oauth/token&#34;
+        async with ayla_client.post(auth0_url, json=auth0_login_data, headers=self._auth0_login_headers) as auth0_resp:
+            ayla_client.cookie_jar.update_cookies(auth0_resp.cookies)
+            auth0_resp_json = await auth0_resp.json()
+            self._set_id_token(auth0_resp.status, auth0_resp_json)
 
     login_data = self._login_data
     login_url = f&#34;{EU_LOGIN_URL if self.europe else LOGIN_URL}/api/v1/token_sign_in&#34;
